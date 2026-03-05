@@ -179,37 +179,51 @@ Made with ❤️ by Mr Dev
 
 const API="https://contact-gain-vcf.onrender.com"
 
-const endTime = new Date().getTime() + (2*24*60*60*1000)
+let unlockTime = 0
 
-function timer(){
+async function loadTimer(){
 
-let now=new Date().getTime()
+let res = await fetch(API + "/timer")
 
-let distance=endTime-now
+let data = await res.json()
 
-let days=Math.floor(distance/(1000*60*60*24))
+unlockTime = data.unlockTime
 
-let hours=Math.floor((distance%(1000*60*60*24))/(1000*60*60))
+startTimer()
 
-let minutes=Math.floor((distance%(1000*60*60))/(1000*60))
+}
 
-let seconds=Math.floor((distance%(1000*60))/1000)
+function startTimer(){
 
-document.getElementById("timer").innerHTML=
+setInterval(()=>{
 
-days+"d "+hours+"h "+minutes+"m "+seconds+"s"
+let now = new Date().getTime()
 
-if(distance<0){
+let distance = unlockTime - now
+
+if(distance <= 0){
 
 document.getElementById("timer").innerHTML="Download Unlocked"
 
 document.getElementById("download").style.display="block"
 
-}
+return
 
 }
 
-setInterval(timer,1000)
+let days=Math.floor(distance/(1000*60*60*24))
+let hours=Math.floor((distance%(1000*60*60*24))/(1000*60*60))
+let minutes=Math.floor((distance%(1000*60*60))/(1000*60))
+let seconds=Math.floor((distance%(1000*60))/1000)
+
+document.getElementById("timer").innerHTML=
+days+"d "+hours+"h "+minutes+"m "+seconds+"s"
+
+},1000)
+
+}
+
+loadTimer()
 
 async function addContact(){
 
