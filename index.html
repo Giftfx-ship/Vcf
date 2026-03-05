@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Contact Gain vcf</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#141e30,#243b55);
+color:white;
+flex-direction:column;
+}
+
+.card{
+
+width:420px;
+padding:30px;
+
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(20px);
+border-radius:20px;
+
+box-shadow:0 20px 60px rgba(0,0,0,0.5);
+
+transform-style:preserve-3d;
+transition:0.5s;
+
+}
+
+.card:hover{
+transform:rotateX(5deg) rotateY(5deg);
+}
+
+h1{
+text-align:center;
+margin-bottom:10px;
+}
+
+#timer{
+text-align:center;
+margin-bottom:15px;
+font-size:20px;
+color:#00ffd5;
+}
+
+.instructions{
+font-size:14px;
+margin-bottom:20px;
+line-height:1.6;
+opacity:0.9;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:10px;
+outline:none;
+}
+
+button{
+width:100%;
+padding:12px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+background:#00ffd5;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#00c9a7;
+}
+
+#download{
+display:none;
+background:#ffc400;
+}
+
+.counter{
+text-align:center;
+margin-top:15px;
+font-size:14px;
+}
+
+.telegram{
+margin-top:20px;
+text-align:center;
+}
+
+.telegram img{
+width:45px;
+transition:0.3s;
+}
+
+.telegram img:hover{
+transform:scale(1.2);
+}
+
+footer{
+margin-top:20px;
+font-size:13px;
+opacity:0.8;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Contact Gain vcf</h1>
+
+<div id="timer">Loading timer...</div>
+
+<div class="instructions">
+
+<b>Instructions</b>
+
+<br><br>
+
+1. Enter your <b>Name</b> and <b>Phone Number</b>  
+2. Click <b>Add To Contact List</b>  
+3. Your contact will be saved with everyone else's  
+4. After <b>2 days</b> the download button will unlock  
+5. Download the <b>.VCF file</b>  
+6. Open the file and save all contacts to your phone
+
+</div>
+
+<input id="name" placeholder="Your Name">
+
+<input id="phone" placeholder="Phone Number">
+
+<button onclick="addContact()">Add To Contact List</button>
+
+<button id="download" onclick="downloadVCF()">Download Contacts VCF</button>
+
+<div class="counter">
+Contacts joined: <span id="count">0</span>
+</div>
+
+<div class="telegram">
+
+<p>Follow Telegram Channel For Updates</p>
+
+<a href="https://t.me/devxtechzone" target="_blank">
+<img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png">
+</a>
+
+</div>
+
+</div>
+
+<footer>
+
+Made with ❤️ by Mr Dev
+
+</footer>
+
+<script>
+
+const API="https://your-render-api.onrender.com"
+
+const endTime = new Date().getTime() + (2*24*60*60*1000)
+
+function timer(){
+
+let now=new Date().getTime()
+
+let distance=endTime-now
+
+let days=Math.floor(distance/(1000*60*60*24))
+
+let hours=Math.floor((distance%(1000*60*60*24))/(1000*60*60))
+
+let minutes=Math.floor((distance%(1000*60*60))/(1000*60))
+
+let seconds=Math.floor((distance%(1000*60))/1000)
+
+document.getElementById("timer").innerHTML=
+
+days+"d "+hours+"h "+minutes+"m "+seconds+"s"
+
+if(distance<0){
+
+document.getElementById("timer").innerHTML="Download Unlocked"
+
+document.getElementById("download").style.display="block"
+
+}
+
+}
+
+setInterval(timer,1000)
+
+async function addContact(){
+
+let name=document.getElementById("name").value
+
+let phone=document.getElementById("phone").value
+
+if(!name || !phone){
+
+alert("Fill all fields")
+
+return
+
+}
+
+await fetch(API+"/add",{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({name,phone})
+
+})
+
+alert("Contact saved!")
+
+loadCount()
+
+}
+
+function downloadVCF(){
+
+window.open(API+"/download")
+
+}
+
+async function loadCount(){
+
+let res=await fetch(API+"/count")
+
+let data=await res.json()
+
+document.getElementById("count").innerText=data.count
+
+}
+
+loadCount()
+
+</script>
+
+</body>
+</html>
