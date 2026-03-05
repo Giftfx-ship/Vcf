@@ -5,7 +5,7 @@
 <title>Contact Gain VCF</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Google Fonts for a professional look -->
+<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
@@ -26,7 +26,6 @@ body{
     flex-direction:column;
 }
 
-/* 3D Card with glassmorphism */
 .card{
     width:420px;
     padding:40px;
@@ -64,7 +63,10 @@ h1{
     margin-bottom:25px;
     line-height:1.8;
     opacity:0.9;
-    text-align:left;
+}
+
+.instructions p{
+    margin-bottom:8px;
 }
 
 input{
@@ -102,23 +104,25 @@ button{
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
-button:hover{
+/* Active hover effect */
+button:hover:not(:disabled){
     transform: translateY(-2px) scale(1.02);
 }
 
-/* Active gradient button */
+/* Download button initial state: dead (white) */
 #download{
+    background:white;
+    color:#aaa;
+    cursor:not-allowed;
+}
+
+/* Active download button state */
+#download.active{
     background: linear-gradient(90deg, #ffc400, #ff8c00);
     color:#141414;
+    cursor:pointer;
 }
 
-button:disabled{
-    background:#555;
-    cursor:not-allowed;
-    color:#ccc;
-}
-
-/* Contacts counter */
 .counter{
     text-align:center;
     margin-top:20px;
@@ -126,7 +130,6 @@ button:disabled{
     font-weight:600;
 }
 
-/* Telegram section */
 .telegram{
     margin-top:25px;
     text-align:center;
@@ -146,14 +149,12 @@ button:disabled{
     transform:scale(1.3);
 }
 
-/* Footer */
 footer{
     margin-top:25px;
     font-size:13px;
     opacity:0.8;
     text-align:center;
 }
-
 </style>
 </head>
 
@@ -166,19 +167,14 @@ footer{
 <div id="timer">Loading timer...</div>
 
 <div class="instructions">
-
-<b>Instructions</b>
-
-<br><br>
-
-1. Enter your <b>Name</b> and <b>Phone Number</b>  
-2. Click <b>Add To Contact List</b>  
-3. Your contact will be saved with everyone else's  
-4. After <b>2 days</b> the download button will unlock  
-5. Download the <b>.VCF file</b>  
-6. Open the file and save all contacts to your phone
-7. Share also in groups and channel for more contacts
-
+    <p><b>Instructions:</b></p>
+    <p>1. Enter your <b>Name</b>.</p>
+    <p>2. Enter your <b>Phone Number</b>.</p>
+    <p>3. Click <b>Add To Contact List</b>.</p>
+    <p>4. Your contact will be saved with everyone else's.</p>
+    <p>5. After <b>2 days</b>, the download button will unlock.</p>
+    <p>6. Click the download button to get the <b>.VCF file</b>.</p>
+    <p>7. Open the file and save all contacts to your phone.</p>
 </div>
 
 <input id="name" placeholder="Your Name">
@@ -186,6 +182,7 @@ footer{
 
 <button onclick="addContact()">Add To Contact List</button>
 
+<!-- Download button always visible but dead -->
 <button id="download" onclick="downloadVCF()" disabled>Download Contacts VCF</button>
 
 <div class="counter">
@@ -225,6 +222,7 @@ function startTimer(){
         if(distance <= 0){
             document.getElementById("timer").innerHTML="Download Unlocked"
             downloadBtn.disabled = false
+            downloadBtn.classList.add("active")
             return
         }
 
