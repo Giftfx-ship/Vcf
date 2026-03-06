@@ -235,40 +235,49 @@ Made with ❤️ by Mr Dev
 <script>
 const API="https://contact-gain-vcf.onrender.com"
 let unlockTime = 0
+let timerInterval
 
 async function loadTimer(){
-    let res = await fetch(API + "/timer")
-    let data = await res.json()
-    unlockTime = data.unlockTime
-    startTimer()
+    try {
+        const res = await fetch(API + "/timer")
+        const data = await res.json()
+        unlockTime = data.unlockTime
+        startTimer()
+    } catch(err) {
+        console.error("Failed to load timer:", err)
+    }
 }
 
 function startTimer(){
     const downloadBtn = document.getElementById("download")
-    setInterval(()=>{
-        let now = new Date().getTime()
-        let distance = unlockTime - now
+
+    // Clear any previous interval to avoid duplicates
+    if(timerInterval) clearInterval(timerInterval)
+
+    timerInterval = setInterval(()=>{
+        const now = new Date().getTime()
+        const distance = unlockTime - now
 
         if(distance <= 0){
-            document.getElementById("timer").innerHTML="Download Unlocked"
+            clearInterval(timerInterval)
+            document.getElementById("timer").innerHTML = "Download Unlocked"
             downloadBtn.disabled = false
             downloadBtn.classList.add("active")
             return
         }
 
-        let days=Math.floor(distance/(1000*60*60*24))
-        let hours=Math.floor((distance%(1000*60*60*24))/(1000*60*60))
-        let minutes=Math.floor((distance%(1000*60*60))/(1000*60))
-        let seconds=Math.floor((distance%(1000*60))/1000)
+        const days = Math.floor(distance / (1000*60*60*24))
+        const hours = Math.floor((distance % (1000*60*60*24)) / (1000*60*60))
+        const minutes = Math.floor((distance % (1000*60*60)) / (1000*60))
+        const seconds = Math.floor((distance % (1000*60)) / 1000)
 
-        document.getElementById("timer").innerHTML=
-        days+"d "+hours+"h "+minutes+"m "+seconds+"s"
+        document.getElementById("timer").innerHTML =
+            `${days}d ${hours}h ${minutes}m ${seconds}s`
 
-    },1000)
+    }, 1000)
 }
 
 loadTimer()
-
 async function addContact(){
     let name=document.getElementById("name").value
     let phone=document.getElementById("phone").value
