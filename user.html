@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>VCF Registry | Contact Exchange</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f8fafc;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            color: #0f172a;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 520px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Card - mature, clean, subtle */
+        .card {
+            background: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 25px 40px -14px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Header */
+        .header {
+            padding: 1.75rem 2rem 0.75rem 2rem;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header h1::before {
+            content: "📇";
+            font-size: 1.5rem;
+            font-weight: normal;
+        }
+
+        .subhead {
+            font-size: 0.8rem;
+            color: #5b6e8c;
+            margin-top: 0.35rem;
+            font-weight: 400;
+        }
+
+        /* Timer section - compact, elegant */
+        .timer-section {
+            padding: 1.25rem 2rem;
+            background: #fafcff;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .timer-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .timer-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #52789e;
+        }
+
+        .timer-value {
+            font-family: 'Inter', monospace;
+            font-size: 1.15rem;
+            font-weight: 500;
+            background: #f1f5f9;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            color: #1e293b;
+            letter-spacing: 0.3px;
+        }
+
+        .timer-note {
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            margin-top: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .timer-note i {
+            font-size: 0.65rem;
+            color: #3b82f6;
+        }
+
+        /* Form styling - refined */
+        .form {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #4a627a;
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.9rem;
+            font-size: 0.95rem;
+            font-family: 'Inter', monospace;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            color: #0f172a;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        input::placeholder {
+            color: #9caec9;
+            font-weight: 400;
+            font-size: 0.85rem;
+        }
+
+        /* Button - clean and professional */
+        button {
+            width: 100%;
+            background: #0f172a;
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 0.9rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.5rem;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.2px;
+        }
+
+        button:hover {
+            background: #1e293b;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 1.25rem 2rem;
+            background: #fafcff;
+            border-top: 1px solid #eef2f6;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #7c8ea0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .footer span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* Modal - mature */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 1.5rem;
+            max-width: 380px;
+            width: 90%;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-icon {
+            font-size: 2.8rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .modal-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+        }
+
+        .modal-card p {
+            font-size: 0.85rem;
+            color: #475569;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: #25D366;
+            color: white;
+            text-decoration: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-secondary {
+            background: #eef2f6;
+            color: #1e293b;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 2rem;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) scale(0.95);
+            background: #0f172a;
+            color: white;
+            padding: 0.7rem 1.4rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            z-index: 1100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+        }
+
+        /* subtle utility */
+        .text-mono {
+            font-family: 'Inter', monospace;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <h1>VCF Registry</h1>
+            <div class="subhead">Secure contact exchange · WhatsApp verified</div>
+        </div>
+
+        <div class="timer-section">
+            <div class="timer-row">
+                <span class="timer-label">⌛ VCF RELEASE</span>
+                <span class="timer-value" id="timerDisplay">--:--:--:--</span>
+            </div>
+            <div class="timer-note">
+                <i class="fas fa-info-circle"></i>
+                <span id="timerMessage">The contact list will be available after the countdown</span>
+            </div>
+        </div>
+
+        <div class="form">
+            <div class="form-group">
+                <label>Full name</label>
+                <input type="text" id="userName" placeholder="e.g., Michael Chen" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>WhatsApp number</label>
+                <input type="tel" id="userPhone" placeholder="+1234567890" autocomplete="off">
+            </div>
+            <button id="submitBtn">Submit registration</button>
+        </div>
+
+        <div class="footer">
+            <span>🔒 Encrypted storage</span>
+            <span>•</span>
+            <span>📱 contacts synced</span>
+            <span>•</span>
+            <span>⏱️ 2-day release window</span>
+        </div>
+    </div>
+</div>
+
+<!-- WhatsApp Modal -->
+<div id="waModal" class="modal">
+    <div class="modal-card">
+        <div class="modal-icon">📢</div>
+        <h3>Join the group</h3>
+        <p>The complete VCF file will be shared inside the WhatsApp group once the timer finishes. Join to receive all contacts.</p>
+        <div class="btn-group">
+            <a id="waLink" href="#" target="_blank" class="btn-primary"><i class="fab fa-whatsapp"></i> Join group</a>
+            <button id="closeModalBtn" class="btn-secondary">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="toastMsg" class="toast">✨ Ready</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+<script>
+    // ======================== CONFIGURATION ========================
+    // Replace with your actual WhatsApp group invite link
+    const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/LLawjYepQeu6zbxgtgmpOS";
+    const API_BASE = window.location.origin;
+    
+    let unlockTimestamp = null;
+    let timerInterval = null;
+
+    // ---------- HELPER FUNCTIONS ----------
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = message;
+        toast.style.backgroundColor = isError ? '#dc2626' : '#0f172a';
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(-50%) scale(1)';
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) scale(0.95)';
+        }, 2800);
+    }
+
+    // Format compact timer (d h m s)
+    function formatCompactTimer(ms) {
+        if (ms <= 0) return "Available now";
+        const days = Math.floor(ms / 86400000);
+        const hours = Math.floor((ms % 86400000) / 3600000);
+        const minutes = Math.floor((ms % 3600000) / 60000);
+        const seconds = Math.floor((ms % 60000) / 1000);
+        
+        if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+        if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+        if (minutes > 0) return `${minutes}m ${seconds}s`;
+        return `${seconds}s`;
+    }
+
+    function updateTimerUI() {
+        const timerEl = document.getElementById('timerDisplay');
+        const messageEl = document.getElementById('timerMessage');
+        if (!unlockTimestamp) return;
+        
+        const now = Date.now();
+        const diff = unlockTimestamp - now;
+        
+        if (diff <= 0) {
+            if (timerInterval) clearInterval(timerInterval);
+            timerEl.textContent = "Released ✓";
+            messageEl.innerHTML = "The VCF file has been published in the WhatsApp group";
+            return;
+        }
+        
+        timerEl.textContent = formatCompactTimer(diff);
+        const daysLeft = Math.ceil(diff / 86400000);
+        if (daysLeft > 1) {
+            messageEl.innerHTML = `VCF will be available in ${daysLeft} days · join group to get notified`;
+        } else if (daysLeft === 1) {
+            messageEl.innerHTML = `Final day — VCF releases tomorrow in the WhatsApp group`;
+        } else {
+            messageEl.innerHTML = `Releasing today · stay tuned on WhatsApp`;
+        }
+    }
+
+    async function loadTimerFromServer() {
+        try {
+            const response = await fetch(`${API_BASE}/api/timer`);
+            if (!response.ok) throw new Error('timer fetch failed');
+            const data = await response.json();
+            unlockTimestamp = data.unlockTime;
+            updateTimerUI();
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimerUI, 1000);
+        } catch (err) {
+            console.warn("fallback to local timer", err);
+            // graceful fallback: 2 days timer local
+            const localFallback = localStorage.getItem("vcf_timer_fallback");
+            if (localFallback) {
+                unlockTimestamp = parseInt(localFallback);
+            } else {
+                unlockTimestamp = Date.now() + (2 * 24 * 60 * 60 * 1000);
+                localStorage.setItem("vcf_timer_fallback", unlockTimestamp);
+            }
+            updateTimerUI();
+            timerInterval = setInterval(updateTimerUI, 1000);
+        }
+    }
+
+    // Submit contact to backend (MongoDB)
+    async function submitContact(name, phone) {
+        try {
+            const response = await fetch(`${API_BASE}/api/contact`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phone })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                return { success: true, message: data.message || 'Registration complete' };
+            } else {
+                return { success: false, message: data.error || 'Submission failed' };
+            }
+        } catch (err) {
+            return { success: false, message: 'Network error. Please try again.' };
+        }
+    }
+
+    // Show WhatsApp group modal
+    function showWhatsAppModal() {
+        const modal = document.getElementById('waModal');
+        const waLink = document.getElementById('waLink');
+        waLink.href = WHATSAPP_GROUP_URL;
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('waModal').classList.remove('active');
+    }
+
+    // Event listeners
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+        const name = document.getElementById('userName').value.trim();
+        const phone = document.getElementById('userPhone').value.trim();
+        
+        if (!name) {
+            showToast('Please enter your full name', true);
+            return;
+        }
+        if (!phone) {
+            showToast('WhatsApp number is required', true);
+            return;
+        }
+        // basic international number validation
+        const phoneClean = phone.replace(/[\s\-\(\)]/g, '');
+        if (!phoneClean.match(/^\+?[0-9]{8,15}$/)) {
+            showToast('Enter a valid phone number (e.g., +1234567890)', true);
+            return;
+        }
+        
+        // Disable button to avoid double submission
+        const btn = document.getElementById('submitBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'Submitting...';
+        btn.disabled = true;
+        
+        const result = await submitContact(name, phoneClean);
+        
+        if (result.success) {
+            showToast('✓ Registration successful');
+            document.getElementById('userName').value = '';
+            document.getElementById('userPhone').value = '';
+            // Show WhatsApp group modal
+            showWhatsAppModal();
+        } else {
+            showToast(result.message || 'Registration failed', true);
+        }
+        
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+    
+    // Close modal handlers
+    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+    // click outside to close? optional for ux
+    window.addEventListener('click', (e) => {
+        const modal = document.getElementById('waModal');
+        if (e.target === modal) closeModal();
+    });
+    
+    // Initialization
+    loadTimerFromServer();
+</script>
+</body>
+</html>
