@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | VCF System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #f3f4f6; font-family: 'Inter', sans-serif; }
+        .navbar { background: white; border-bottom: 1px solid #e5e7eb; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 700; font-size: 1.25rem; color: #111827; }
+        .logout { color: #6b7280; cursor: pointer; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: white; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; color: #6b7280; letter-spacing: 0.05em; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: #111827; margin-top: 0.25rem; }
+        .timer-info { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .section { background: white; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; overflow: hidden; }
+        .section-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+        .section-header h2 { font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #374151; }
+        .btn-download { background: #059669; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-weight: 500; }
+        .btn-download:disabled { background: #9ca3af; cursor: not-allowed; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem 1.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #6b7280; background: #f9fafb; }
+        td { font-size: 0.875rem; color: #111827; }
+        .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #f3f4f6; }
+        .login-card { background: white; padding: 2rem; border-radius: 1rem; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .login-card h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .login-card input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; margin: 1rem 0; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: #111827; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-size: 0.875rem; opacity: 0; transition: 0.15s; z-index: 100; }
+    </style>
+</head>
+<body id="app">
+    <div id="toast" class="toast"></div>
+    <script>
+        let authKey = null;
+        let contacts = [];
+        let stats = { totalContacts: 0, unlockTime: null, timerUnlocked: false };
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.background = isError ? '#dc2626' : '#111827';
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 3000);
+        }
+
+        async function apiCall(endpoint, options = {}) {
+            const res = await fetch(endpoint, {
+                ...options,
+                headers: { ...options.headers, 'X-Admin-Key': authKey }
+            });
+            return res;
+        }
+
+        async function loadDashboard() {
+            try {
+                const [contactsRes, statsRes] = await Promise.all([
+                    apiCall('/api/admin/contacts'),
+                    apiCall('/api/admin/stats')
+                ]);
+                if (contactsRes.ok) contacts = await contactsRes.json();
+                if (statsRes.ok) stats = await statsRes.json();
+                renderTable();
+                renderStats();
+            } catch (err) { showToast('Failed to load data', true); }
+        }
+
+        function renderStats() {
+            document.getElementById('totalContacts').innerText = stats.totalContacts || 0;
+            const unlock = stats.unlockTime;
+            if (unlock) {
+                const remaining = unlock - Date.now();
+                if (remaining <= 0) {
+                    document.getElementById('timerValue').innerHTML = '<span style="color:#059669;">✓ Unlocked</span>';
+                    document.getElementById('downloadBtn').disabled = false;
+                } else {
+                    const days = Math.ceil(remaining / 86400000);
+                    document.getElementById('timerValue').innerHTML = `${days} day(s) remaining`;
+                    document.getElementById('downloadBtn').disabled = true;
+                }
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('contactsBody');
+            if (!contacts.length) { tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;padding:2rem;">No contacts yet</td></tr>'; return; }
+            tbody.innerHTML = contacts.map(c => `<tr><td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.phone)}</td></tr>`).join('');
+        }
+
+        function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+
+        async function downloadVCF() {
+            try {
+                const res = await apiCall('/api/admin/download');
+                if (res.status === 403) { const data = await res.json(); showToast(data.error || 'Timer locked', true); return; }
+                if (!res.ok) { showToast('Unauthorized or error', true); return; }
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url; a.download = 'contacts.vcf'; a.click();
+                URL.revokeObjectURL(url);
+                showToast('VCF downloaded successfully');
+            } catch (err) { showToast('Download failed', true); }
+        }
+
+        // Login flow
+        function showLogin() {
+            document.getElementById('app').innerHTML = `
+                <div class="login-container">
+                    <div class="login-card">
+                        <h1>Admin Access</h1>
+                        <p style="color:#6b7280; margin-bottom:1rem;">Enter your credentials to continue</p>
+                        <input type="password" id="adminKey" placeholder="Master Key">
+                        <button id="loginBtn" style="width:100%; background:#111827; color:white; padding:0.75rem; border:none; border-radius:0.5rem; cursor:pointer;">Login</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('loginBtn').onclick = async () => {
+                const key = document.getElementById('adminKey').value;
+                const res = await fetch('/api/admin/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    authKey = key;
+                    loadAdminDashboard();
+                } else {
+                    showToast('Invalid credentials', true);
+                }
+            };
+        }
+
+        function loadAdminDashboard() {
+            document.getElementById('app').innerHTML = `
+                <div class="navbar">
+                    <div class="logo">VCF Admin Console</div>
+                    <div class="logout" id="logoutBtn">Logout</div>
+                </div>
+                <div class="container">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-label">Total Contacts</div><div class="stat-value" id="totalContacts">0</div></div>
+                        <div class="stat-card timer-info"><div class="stat-label">VCF Release Status</div><div class="stat-value" id="timerValue">Loading...</div></div>
+                    </div>
+                    <div class="section">
+                        <div class="section-header"><h2>Contact List</h2><button class="btn-download" id="downloadBtn">Download VCF</button></div>
+                        <div style="overflow-x:auto;"><table><thead><tr><th>Name</th><th>Phone Number</th></tr></thead><tbody id="contactsBody"></tbody></table></div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('logoutBtn').onclick = () => { authKey = null; showLogin(); };
+            document.getElementById('downloadBtn').onclick = downloadVCF;
+            loadDashboard();
+            setInterval(() => { if (authKey) loadDashboard(); }, 30000);
+        }
+
+        showLogin();
+    </script>
+</body>
+</html>
