@@ -340,7 +340,7 @@
         <div class="form">
             <div class="form-group">
                 <label>Full name</label>
-                <input type="text" id="userName" placeholder="e.g., Michael Chen" autocomplete="off">
+                <input type="text" id="userName" placeholder="e.g., Dev Gift" autocomplete="off">
             </div>
             <div class="form-group">
                 <label>WhatsApp number</label>
@@ -354,7 +354,7 @@
             <span>•</span>
             <span>📱 contacts synced</span>
             <span>•</span>
-            <span>⏱️ 2-day release window</span>
+            <span>😗 Made by Dev Gift</span>
         </div>
     </div>
 </div>
@@ -429,7 +429,7 @@
         timerEl.textContent = formatCompactTimer(diff);
         const daysLeft = Math.ceil(diff / 86400000);
         if (daysLeft > 1) {
-            messageEl.innerHTML = `VCF will be available in ${daysLeft} days · join group to get notified`;
+            messageEl.innerHTML = `VCF will be available in ${daysLeft} days · vcf will be posted in group when ready,kindly join group to be notified.`;
         } else if (daysLeft === 1) {
             messageEl.innerHTML = `Final day — VCF releases tomorrow in the WhatsApp group`;
         } else {
