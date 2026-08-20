@@ -225,7 +225,7 @@ app.delete('/api/admin/contacts', async (req, res) => {
     }
 });
 
-// Edit contact
+// Edit contact (name AND phone)
 app.put('/api/admin/contact/:id', async (req, res) => {
     const adminKey = req.headers['x-admin-key'];
     const admin = await Setting.findOne({ key: 'adminKey' });
@@ -233,7 +233,16 @@ app.put('/api/admin/contact/:id', async (req, res) => {
         return res.status(401).json({ error: 'Unauthorized' });
     }
     const { name, phone } = req.body;
+    if (!name || !phone) {
+        return res.status(400).json({ error: 'Name and phone are required' });
+    }
     try {
+        // Check if phone already exists for another contact
+        const existing = await Contact.findOne({ phone, _id: { $ne: req.params.id } });
+        if (existing) {
+            return res.status(409).json({ error: 'Phone number already in use by another contact' });
+        }
+        
         const contact = await Contact.findByIdAndUpdate(
             req.params.id,
             { name, phone },
@@ -248,7 +257,33 @@ app.put('/api/admin/contact/:id', async (req, res) => {
     }
 });
 
-// Update batch number
+// Edit batch number for a specific contact
+app.put('/api/admin/contact/:id/batch', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    const admin = await Setting.findOne({ key: 'adminKey' });
+    if (adminKey !== admin.value) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const { batch } = req.body;
+    if (!batch) {
+        return res.status(400).json({ error: 'Batch number is required' });
+    }
+    try {
+        const contact = await Contact.findByIdAndUpdate(
+            req.params.id,
+            { batch },
+            { new: true }
+        );
+        if (!contact) {
+            return res.status(404).json({ error: 'Contact not found' });
+        }
+        res.json({ success: true, contact });
+    } catch (error) {
+        res.status(500).json({ error: 'Update failed' });
+    }
+});
+
+// Update batch number (global)
 app.put('/api/admin/batch', async (req, res) => {
     const adminKey = req.headers['x-admin-key'];
     const admin = await Setting.findOne({ key: 'adminKey' });
