@@ -215,6 +215,34 @@
             font-size: 0.7rem;
             font-weight: 600;
         }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.3rem;
+        }
+        .status-dot.locked {
+            background: #f59e0b;
+            animation: pulse 2s infinite;
+        }
+        .status-dot.unlocked {
+            background: #10b981;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .timer-display {
+            font-family: 'Inter', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #0b1e2e;
+        }
+        .timer-status-text {
+            font-size: 0.7rem;
+            color: #4b6a88;
+        }
 
         .section {
             background: white;
@@ -309,6 +337,13 @@
             display: block;
             margin-bottom: 0.5rem;
         }
+        .batch-tag {
+            background: #eef2f6;
+            padding: 0.15rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
 
         .modal-overlay {
             position: fixed;
@@ -343,7 +378,7 @@
             font-size: 0.9rem;
             margin-bottom: 1.5rem;
         }
-        .modal input, .modal textarea {
+        .modal input, .modal textarea, .modal select {
             width: 100%;
             padding: 0.8rem 1rem;
             border: 1px solid #dce3ec;
@@ -353,7 +388,7 @@
             font-family: 'Inter', sans-serif;
         }
         .modal textarea { min-height: 80px; resize: vertical; }
-        .modal input:focus, .modal textarea:focus {
+        .modal input:focus, .modal textarea:focus, .modal select:focus {
             outline: none;
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
@@ -387,6 +422,8 @@
             let authKey = null;
             let contacts = [];
             let stats = { totalContacts: 0, unlockTime: null, batch: '1', announcement: '' };
+            let unlockTimestamp = null;
+            let timerInterval = null;
 
             const toastEl = document.getElementById('toast');
             const toastMsg = document.getElementById('toastMsg');
@@ -404,6 +441,45 @@
                     headers: { ...options.headers, 'X-Admin-Key': authKey || '' }
                 });
                 return res;
+            }
+
+            // ========== TIMER (same as user page) ==========
+            function formatTimer(ms) {
+                if (ms <= 0) return '🎉 Released';
+                const days = Math.floor(ms / 86400000);
+                const hours = Math.floor((ms % 86400000) / 3600000);
+                const minutes = Math.floor((ms % 3600000) / 60000);
+                const seconds = Math.floor((ms % 60000) / 1000);
+
+                if (days > 0) {
+                    return `${days}d ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                }
+                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+
+            function updateTimerUI() {
+                const timerEl = document.getElementById('timerDisplay');
+                const statusDot = document.getElementById('statusDot');
+                const statusText = document.getElementById('statusText');
+                const downloadBtn = document.getElementById('downloadBtn');
+                
+                if (!unlockTimestamp || !timerEl) return;
+                const now = Date.now();
+                const diff = unlockTimestamp - now;
+
+                if (diff <= 0) {
+                    if (timerInterval) clearInterval(timerInterval);
+                    timerEl.textContent = '🎉 Released';
+                    if (statusDot) statusDot.className = 'status-dot unlocked';
+                    if (statusText) statusText.textContent = 'VCF is now available!';
+                    if (downloadBtn) downloadBtn.disabled = false;
+                    return;
+                }
+
+                timerEl.textContent = formatTimer(diff);
+                if (statusDot) statusDot.className = 'status-dot locked';
+                if (statusText) statusText.textContent = `Releasing in ${Math.ceil(diff / 86400000)} day(s)`;
+                if (downloadBtn) downloadBtn.disabled = true;
             }
 
             // ========== LOGIN ==========
@@ -475,7 +551,11 @@
                             </div>
                             <div class="stat-card timer-info">
                                 <div class="stat-label"><i class="fas fa-clock"></i> VCF release</div>
-                                <div class="stat-value" id="timerValue">—</div>
+                                <div class="stat-value">
+                                    <span class="timer-display" id="timerDisplay">--:--:--</span>
+                                    <span class="status-dot locked" id="statusDot"></span>
+                                    <span class="timer-status-text" id="statusText">Loading...</span>
+                                </div>
                             </div>
                         </div>
 
@@ -496,7 +576,7 @@
                             </div>
                             <div class="table-wrap">
                                 <table>
-                                    <thead><tr><th>Name</th><th>Phone</th><th>Batch</th><th>Submitted</th><th>Action</th></tr></thead>
+                                    <thead><tr><th>Name</th><th>Phone</th><th>Batch</th><th>Submitted</th><th>Actions</th></tr></thead>
                                     <tbody id="contactsBody"></tbody>
                                 </table>
                             </div>
@@ -567,6 +647,25 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Edit Contact Modal -->
+                    <div class="modal-overlay" id="editContactModal">
+                        <div class="modal">
+                            <h3><i class="fas fa-user-edit"></i> Edit Contact</h3>
+                            <p>Update the contact's details below.</p>
+                            <input type="hidden" id="editContactId">
+                            <label>Name</label>
+                            <input type="text" id="editName" placeholder="Full name">
+                            <label>Phone</label>
+                            <input type="text" id="editPhone" placeholder="Phone number">
+                            <label>Batch</label>
+                            <input type="text" id="editBatch" placeholder="e.g., Batch 2">
+                            <div class="modal-actions">
+                                <button class="btn btn-outline" onclick="closeModal('editContactModal')">Cancel</button>
+                                <button class="btn btn-primary" onclick="saveContactEdit()">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
                 `;
 
                 document.getElementById('logoutBtn').onclick = () => { authKey = null; showLogin(); };
@@ -584,30 +683,28 @@
                         apiCall('/api/admin/contacts'),
                         apiCall('/api/admin/stats')
                     ]);
-                    if (contactsRes.ok) contacts = await contactsRes.json();
-                    if (statsRes.ok) stats = await statsRes.json();
+                    if (contactsRes.ok) {
+                        contacts = await contactsRes.json();
+                        // Update unlockTimestamp from stats
+                        if (stats && stats.unlockTime) {
+                            unlockTimestamp = stats.unlockTime;
+                        }
+                    }
+                    if (statsRes.ok) {
+                        stats = await statsRes.json();
+                        unlockTimestamp = stats.unlockTime;
+                    }
                     renderTable();
                     renderStats();
+                    updateTimerUI();
+                    if (timerInterval) clearInterval(timerInterval);
+                    timerInterval = setInterval(updateTimerUI, 1000);
                 } catch (_) { showToast('Error loading data', 'error'); }
             }
 
             function renderStats() {
                 document.getElementById('totalContacts').innerText = stats.totalContacts || 0;
                 document.getElementById('batchDisplay').innerText = stats.batch || '1';
-                
-                const timerEl = document.getElementById('timerValue');
-                const unlock = stats.unlockTime;
-                if (unlock) {
-                    const remaining = unlock - Date.now();
-                    if (remaining <= 0) {
-                        timerEl.innerHTML = `<span>✓ Released</span> <span class="badge-unlocked">unlocked</span>`;
-                        document.getElementById('downloadBtn').disabled = false;
-                    } else {
-                        const days = Math.ceil(remaining / 86400000);
-                        timerEl.innerHTML = `<span>${days} day${days > 1 ? 's' : ''} left</span> <span class="badge-locked">locked</span>`;
-                        document.getElementById('downloadBtn').disabled = true;
-                    }
-                }
             }
 
             function renderTable() {
@@ -620,10 +717,10 @@
                     <tr>
                         <td>${escapeHtml(c.name)}</td>
                         <td>${escapeHtml(c.phone)}</td>
-                        <td><span class="badge badge-locked" style="background:#eef2f6;padding:0.15rem 0.6rem;border-radius:1rem;font-size:0.7rem;">${escapeHtml(c.batch || 'Batch 1')}</span></td>
+                        <td><span class="batch-tag">${escapeHtml(c.batch || 'Batch 1')}</span></td>
                         <td style="font-size:0.75rem;color:#6b8aaa;">${new Date(c.submittedAt).toLocaleDateString()}</td>
                         <td>
-                            <button class="btn btn-primary btn-sm" onclick="editContact('${c._id}')" style="margin-right:0.3rem;">
+                            <button class="btn btn-primary btn-sm" onclick="openEditContact('${c._id}')" style="margin-right:0.3rem;">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button class="btn btn-danger btn-sm" onclick="deleteContact('${c._id}')">
@@ -649,26 +746,56 @@
                 } catch (_) { showToast('Server error', 'error'); }
             }
 
-            async function editContact(id) {
+            function openEditContact(id) {
                 const contact = contacts.find(c => c._id === id);
                 if (!contact) return;
-                const newName = prompt('Edit name:', contact.name);
-                if (newName === null) return;
-                const newPhone = prompt('Edit phone:', contact.phone);
-                if (newPhone === null) return;
-                if (!newName.trim() || !newPhone.trim()) {
-                    showToast('Name and phone are required', 'error');
+                document.getElementById('editContactId').value = id;
+                document.getElementById('editName').value = contact.name || '';
+                document.getElementById('editPhone').value = contact.phone || '';
+                document.getElementById('editBatch').value = contact.batch || 'Batch 1';
+                document.getElementById('editContactModal').classList.add('active');
+            }
+
+            async function saveContactEdit() {
+                const id = document.getElementById('editContactId').value;
+                const name = document.getElementById('editName').value.trim();
+                const phone = document.getElementById('editPhone').value.trim();
+                const batch = document.getElementById('editBatch').value.trim();
+
+                if (!name || !phone || !batch) {
+                    showToast('All fields are required', 'error');
                     return;
                 }
+
                 try {
-                    const res = await apiCall(`/api/admin/contact/${id}`, {
+                    // Update name and phone
+                    const res1 = await apiCall(`/api/admin/contact/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name: newName.trim(), phone: newPhone.trim() })
+                        body: JSON.stringify({ name, phone })
                     });
-                    if (res.ok) { showToast('Contact updated', 'success'); loadDashboard(); }
-                    else showToast('Update failed', 'error');
-                } catch (_) { showToast('Server error', 'error'); }
+                    if (!res1.ok) {
+                        const data = await res1.json();
+                        showToast(data.error || 'Update failed', 'error');
+                        return;
+                    }
+
+                    // Update batch
+                    const res2 = await apiCall(`/api/admin/contact/${id}/batch`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ batch })
+                    });
+                    if (res2.ok) {
+                        showToast('Contact updated successfully!', 'success');
+                        closeModal('editContactModal');
+                        loadDashboard();
+                    } else {
+                        showToast('Batch update failed', 'error');
+                    }
+                } catch (_) {
+                    showToast('Server error', 'error');
+                }
             }
 
             async function clearAllContacts() {
@@ -737,8 +864,11 @@
                         body: JSON.stringify({ days })
                     });
                     if (res.ok) {
+                        const data = await res.json();
+                        unlockTimestamp = data.unlockTime;
                         showToast(`Timer set to ${days} days`, 'success');
                         closeModal('timerModal');
+                        updateTimerUI();
                         loadDashboard();
                     } else showToast('Update failed', 'error');
                 } catch (_) { showToast('Server error', 'error'); }
@@ -748,8 +878,11 @@
                 try {
                     const res = await apiCall('/api/admin/timer/reset', { method: 'POST' });
                     if (res.ok) {
+                        const data = await res.json();
+                        unlockTimestamp = data.unlockTime;
                         showToast('Timer reset to 2 days', 'success');
                         closeModal('timerModal');
+                        updateTimerUI();
                         loadDashboard();
                     } else showToast('Reset failed', 'error');
                 } catch (_) { showToast('Server error', 'error'); }
@@ -849,10 +982,13 @@
                 document.getElementById(id).classList.remove('active');
             }
 
+            // Make functions globally accessible
             window.openTimerModal = openTimerModal;
             window.openBatchModal = openBatchModal;
             window.openAnnouncementModal = openAnnouncementModal;
             window.openKeyModal = openKeyModal;
+            window.openEditContact = openEditContact;
+            window.saveContactEdit = saveContactEdit;
             window.updateTimer = updateTimer;
             window.resetTimer = resetTimer;
             window.updateBatch = updateBatch;
@@ -860,7 +996,6 @@
             window.updateAdminKey = updateAdminKey;
             window.closeModal = closeModal;
             window.deleteContact = deleteContact;
-            window.editContact = editContact;
             window.clearAllContacts = clearAllContacts;
             window.exportCSV = exportCSV;
             window.downloadVCF = downloadVCF;
