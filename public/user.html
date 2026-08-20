@@ -385,6 +385,33 @@
             opacity: 0.3;
         }
 
+        .brand-text {
+            font-weight: 600;
+            background: linear-gradient(135deg, #1a56db, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .channel-link {
+            background: #25D366;
+            color: white !important;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+        }
+
+        .channel-link:hover {
+            background: #1ebe5a;
+            transform: scale(1.05);
+            text-decoration: none !important;
+        }
+
+        .channel-link i {
+            color: white !important;
+        }
+
         /* Modal */
         .modal {
             position: fixed;
@@ -451,7 +478,7 @@
             flex-wrap: wrap;
         }
 
-        .btn-primary {
+        .btn-whatsapp {
             background: #25D366;
             color: white;
             text-decoration: none;
@@ -467,7 +494,7 @@
             cursor: pointer;
         }
 
-        .btn-primary:hover {
+        .btn-whatsapp:hover {
             background: #1ebe5a;
             transform: scale(1.03);
         }
@@ -598,14 +625,14 @@
             <div class="form-group">
                 <label><i class="fas fa-user"></i> Full name</label>
                 <div class="input-wrapper">
-                    <input type="text" id="userName" placeholder="e.g., Dev Gift" autocomplete="off">
+                    <input type="text" id="userName" placeholder="e.g., Alex Rivera" autocomplete="off">
                     <i class="fas fa-user input-icon"></i>
                 </div>
             </div>
             <div class="form-group">
                 <label><i class="fab fa-whatsapp"></i> WhatsApp number</label>
                 <div class="input-wrapper">
-                    <input type="tel" id="userPhone" placeholder="+234 234 567 890" autocomplete="off">
+                    <input type="tel" id="userPhone" placeholder="+1 234 567 890" autocomplete="off">
                     <i class="fab fa-whatsapp input-icon"></i>
                 </div>
             </div>
@@ -621,11 +648,19 @@
             <span class="footer-divider">•</span>
             <span><i class="fas fa-sync"></i> Real-time sync</span>
             <span class="footer-divider">•</span>
-            <a href="https://whatsapp.com/channel/0029VbAjawl9MF8vQQa0ZT32" target="_blank">
-                <i class="fab fa-whatsapp"></i> Channel
+            <a href="https://whatsapp.com/channel/0029VbAjawl9MF8vQQa0ZT32" target="_blank" class="channel-link">
+                <i class="fab fa-whatsapp"></i> Follow WhatsApp channel
             </a>
             <span class="footer-divider">•</span>
-            <span><i class="fas fa-code"></i> Dev Gift</span>
+            <span>
+                <i class="fas fa-code"></i> 
+                <span class="brand-text">Dev Gift</span>
+            </span>
+            <span class="footer-divider">•</span>
+            <span>
+                <i class="fas fa-bolt"></i> 
+                <span class="brand-text">Blaze Tech</span>
+            </span>
         </div>
     </div>
 </div>
@@ -637,7 +672,7 @@
         <h3>Registration Complete!</h3>
         <p>You're now registered. The complete VCF file will be shared in the WhatsApp group once the timer finishes.</p>
         <div class="btn-group">
-            <a id="waLink" href="#" target="_blank" class="btn-primary">
+            <a id="waLink" href="#" target="_blank" class="btn-whatsapp">
                 <i class="fab fa-whatsapp"></i> Join Group
             </a>
             <button id="closeModalBtn" class="btn-secondary">Close</button>
@@ -686,7 +721,7 @@
 
     // ========== TIMER ==========
     function formatTimer(ms) {
-        if (ms <= 0) return 'Released ✓';
+        if (ms <= 0) return '🎉 Released';
         const days = Math.floor(ms / 86400000);
         const hours = Math.floor((ms % 86400000) / 3600000);
         const minutes = Math.floor((ms % 3600000) / 60000);
