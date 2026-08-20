@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VCF Admin · secure console</title>
+  <title>VCF Admin · complete console</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
@@ -14,7 +14,7 @@
       color: #0b1e2e;
     }
 
-    /* toast */
+    /* Toast */
     .toast {
       position: fixed;
       bottom: 2.5rem;
@@ -37,8 +37,9 @@
     }
     .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .toast.error { background: #b91c2c; }
+    .toast.success { background: #059669; }
 
-    /* login */
+    /* Login */
     .login-container {
       min-height: 100vh;
       display: flex;
@@ -54,8 +55,6 @@
       width: 100%;
       max-width: 400px;
       box-shadow: 0 30px 50px -20px rgba(0,20,40,0.25), 0 2px 6px rgba(0,0,0,0.02);
-      backdrop-filter: blur(2px);
-      transition: 0.2s;
     }
     .login-card h1 {
       font-size: 1.6rem;
@@ -117,7 +116,7 @@
       box-shadow: 0 8px 18px rgba(11,30,46,0.15);
     }
 
-    /* navbar */
+    /* Navbar */
     .navbar {
       background: #ffffff;
       padding: 0.8rem 2.5rem;
@@ -125,7 +124,6 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #e2e9f2;
-      backdrop-filter: blur(4px);
       position: sticky;
       top: 0;
       z-index: 50;
@@ -139,6 +137,11 @@
       gap: 0.6rem;
     }
     .logo i { color: #2563eb; font-size: 1.2rem; }
+    .nav-actions {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+    }
     .logout {
       color: #4b6a88;
       font-weight: 500;
@@ -154,17 +157,17 @@
       color: #0b1e2e;
     }
 
-    /* container */
+    /* Container */
     .container {
       max-width: 1400px;
       margin: 0 auto;
       padding: 2rem 2.5rem;
     }
 
-    /* stats grid */
+    /* Stats Grid */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1.5rem;
       margin-bottom: 2.5rem;
     }
@@ -174,10 +177,6 @@
       padding: 1.5rem 1.8rem;
       box-shadow: 0 4px 12px rgba(0,0,0,0.02), 0 1px 3px rgba(0,0,0,0.04);
       border: 1px solid #eaf0f6;
-      transition: 0.2s;
-    }
-    .stat-card:hover {
-      border-color: #cddae9;
     }
     .stat-label {
       font-size: 0.7rem;
@@ -206,34 +205,33 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      flex-wrap: wrap;
     }
-    .stat-card.timer-info .stat-value .badge-unlocked {
+    .badge-unlocked {
       background: #d1fae5;
       color: #065f46;
       padding: 0.15rem 0.8rem;
       border-radius: 2rem;
       font-size: 0.7rem;
       font-weight: 600;
-      margin-left: 0.3rem;
     }
-    .stat-card.timer-info .stat-value .badge-locked {
+    .badge-locked {
       background: #fef3c7;
       color: #92400e;
       padding: 0.15rem 0.8rem;
       border-radius: 2rem;
       font-size: 0.7rem;
       font-weight: 600;
-      margin-left: 0.3rem;
     }
 
-    /* section – contact table */
+    /* Sections */
     .section {
       background: white;
       border-radius: 1.5rem;
       box-shadow: 0 4px 12px rgba(0,0,0,0.02), 0 1px 3px rgba(0,0,0,0.04);
       border: 1px solid #eaf0f6;
       overflow: hidden;
-      transition: 0.2s;
+      margin-bottom: 2rem;
     }
     .section-header {
       padding: 1.2rem 2rem;
@@ -259,33 +257,76 @@
       color: #2563eb;
       font-size: 1rem;
     }
-    .btn-download {
-      background: #0b1e2e;
-      color: white;
-      border: none;
+    .section-actions {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .btn {
       padding: 0.6rem 1.4rem;
       border-radius: 2.5rem;
-      cursor: pointer;
       font-weight: 500;
       font-size: 0.8rem;
+      cursor: pointer;
       transition: 0.15s;
       display: flex;
       align-items: center;
       gap: 0.5rem;
       font-family: 'Inter', sans-serif;
+      border: none;
     }
-    .btn-download:hover:not(:disabled) {
+    .btn-primary {
+      background: #0b1e2e;
+      color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
       background: #1b3144;
       transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(11,30,46,0.15);
     }
-    .btn-download:disabled {
+    .btn-primary:disabled {
       background: #bccbde;
       cursor: not-allowed;
       opacity: 0.7;
     }
+    .btn-success {
+      background: #059669;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #047857;
+      transform: translateY(-1px);
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #b91c2c;
+      transform: translateY(-1px);
+    }
+    .btn-warning {
+      background: #d97706;
+      color: white;
+    }
+    .btn-warning:hover {
+      background: #b45309;
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      background: transparent;
+      color: #4b6a88;
+      border: 1px solid #dce3ec;
+    }
+    .btn-outline:hover {
+      background: #f1f6fc;
+    }
+    .btn-sm {
+      padding: 0.3rem 0.8rem;
+      font-size: 0.7rem;
+    }
 
-    /* table */
+    /* Table */
     .table-wrap {
       overflow-x: auto;
       padding: 0.5rem 0;
@@ -325,15 +366,76 @@
       margin-bottom: 0.5rem;
     }
 
-    /* responsive */
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(11, 26, 46, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1.5rem;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: white;
+      border-radius: 1.5rem;
+      max-width: 480px;
+      width: 100%;
+      padding: 2rem;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+    }
+    .modal h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .modal p {
+      color: #4b6a88;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+    .modal input, .modal select {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid #dce3ec;
+      border-radius: 1rem;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      font-family: 'Inter', sans-serif;
+    }
+    .modal input:focus, .modal select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+    }
+    .modal-actions {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: flex-end;
+    }
+
+    /* Responsive */
     @media (max-width: 640px) {
       .navbar { padding: 0.6rem 1.2rem; flex-wrap: wrap; gap: 0.4rem; }
       .container { padding: 1.2rem; }
       .stats-grid { grid-template-columns: 1fr; }
       .section-header { flex-direction: column; align-items: flex-start; }
+      .section-actions { width: 100%; }
+      .section-actions .btn { flex: 1; justify-content: center; }
       th, td { padding: 0.8rem 1rem; }
       .login-card { padding: 2rem 1.5rem; }
       .toast { right: 1rem; bottom: 1.5rem; width: calc(100% - 2rem); border-radius: 1.5rem; justify-content: center; }
+      .modal { padding: 1.5rem; }
+      .modal-actions { flex-direction: column; }
+      .modal-actions .btn { width: 100%; justify-content: center; }
     }
   </style>
 </head>
@@ -345,14 +447,14 @@
     (function() {
       let authKey = null;
       let contacts = [];
-      let stats = { totalContacts: 0, unlockTime: null, timerUnlocked: false };
+      let stats = { totalContacts: 0, unlockTime: null };
 
       const toastEl = document.getElementById('toast');
       const toastMsg = document.getElementById('toastMsg');
 
-      function showToast(msg, isError = false) {
+      function showToast(msg, type = '') {
         toastMsg.textContent = msg;
-        toastEl.className = 'toast show' + (isError ? ' error' : '');
+        toastEl.className = 'toast show ' + type;
         clearTimeout(toastEl._hide);
         toastEl._hide = setTimeout(() => {
           toastEl.classList.remove('show');
@@ -367,7 +469,7 @@
         return res;
       }
 
-      // Login flow
+      // ========== LOGIN ==========
       function showLogin() {
         document.getElementById('app').innerHTML = `
           <div class="login-container">
@@ -382,7 +484,7 @@
         `;
         document.getElementById('loginBtn').onclick = async () => {
           const key = document.getElementById('adminKey').value.trim();
-          if (!key) { showToast('Enter the master key', true); return; }
+          if (!key) { showToast('Enter the master key', 'error'); return; }
           try {
             const res = await fetch('/api/admin/verify', {
               method: 'POST',
@@ -394,23 +496,31 @@
               authKey = key;
               loadAdminDashboard();
             } else {
-              showToast('Invalid credentials', true);
+              showToast('Invalid credentials', 'error');
             }
           } catch (_) {
-            showToast('Server error', true);
+            showToast('Server error', 'error');
           }
         };
-        // enter key
         document.getElementById('adminKey').addEventListener('keydown', (e) => {
           if (e.key === 'Enter') document.getElementById('loginBtn').click();
         });
       }
 
+      // ========== DASHBOARD ==========
       function loadAdminDashboard() {
         document.getElementById('app').innerHTML = `
           <div class="navbar">
             <div class="logo"><i class="fas fa-database"></i> VCF Console</div>
-            <div class="logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</div>
+            <div class="nav-actions">
+              <button class="btn btn-outline btn-sm" onclick="openTimerModal()">
+                <i class="fas fa-clock"></i> Timer
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="openAdminKeyModal()">
+                <i class="fas fa-key"></i> Key
+              </button>
+              <div class="logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</div>
+            </div>
           </div>
           <div class="container">
             <div class="stats-grid">
@@ -427,29 +537,69 @@
             <div class="section">
               <div class="section-header">
                 <h2><i class="fas fa-address-book"></i> Registered contacts</h2>
-                <button class="btn-download" id="downloadBtn"><i class="fas fa-file-export"></i> Download .vcf</button>
+                <div class="section-actions">
+                  <button class="btn btn-success btn-sm" onclick="exportCSV()">
+                    <i class="fas fa-file-csv"></i> CSV
+                  </button>
+                  <button class="btn btn-primary btn-sm" id="downloadBtn" onclick="downloadVCF()">
+                    <i class="fas fa-file-export"></i> VCF
+                  </button>
+                  <button class="btn btn-danger btn-sm" onclick="clearAllContacts()">
+                    <i class="fas fa-trash"></i> Clear all
+                  </button>
+                </div>
               </div>
               <div class="table-wrap">
                 <table>
-                  <thead><tr><th>Full name</th><th>WhatsApp number</th></tr></thead>
+                  <thead><tr><th>Name</th><th>Phone</th><th>Submitted</th><th>Action</th></tr></thead>
                   <tbody id="contactsBody"></tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timer Modal -->
+          <div class="modal-overlay" id="timerModal">
+            <div class="modal">
+              <h3><i class="fas fa-clock"></i> VCF Release Timer</h3>
+              <p>Set the countdown until the VCF file can be downloaded.</p>
+              <label>Days until release</label>
+              <input type="number" id="timerDays" value="2" min="0" max="30">
+              <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('timerModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="updateTimer()">Update timer</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin Key Modal -->
+          <div class="modal-overlay" id="adminKeyModal">
+            <div class="modal">
+              <h3><i class="fas fa-key"></i> Change Admin Key</h3>
+              <p>Update the master key used to access this dashboard.</p>
+              <label>Current key</label>
+              <input type="password" id="currentKey" placeholder="Enter current key">
+              <label>New key</label>
+              <input type="password" id="newKey" placeholder="Enter new key">
+              <label>Confirm new key</label>
+              <input type="password" id="confirmKey" placeholder="Confirm new key">
+              <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('adminKeyModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="updateAdminKey()">Update key</button>
               </div>
             </div>
           </div>
         `;
 
         document.getElementById('logoutBtn').onclick = () => { authKey = null; showLogin(); };
-        document.getElementById('downloadBtn').onclick = downloadVCF;
-
         loadDashboard();
-        // refresh every 25s
         if (window._refreshInterval) clearInterval(window._refreshInterval);
         window._refreshInterval = setInterval(() => {
           if (authKey) loadDashboard();
-        }, 25000);
+        }, 30000);
       }
 
+      // ========== LOAD DATA ==========
       async function loadDashboard() {
         try {
           const [contactsRes, statsRes] = await Promise.all([
@@ -461,10 +611,11 @@
           renderTable();
           renderStats();
         } catch (_) {
-          showToast('Error loading data', true);
+          showToast('Error loading data', 'error');
         }
       }
 
+      // ========== RENDER ==========
       function renderStats() {
         document.getElementById('totalContacts').innerText = stats.totalContacts || 0;
         const timerEl = document.getElementById('timerValue');
@@ -488,11 +639,16 @@
       function renderTable() {
         const tbody = document.getElementById('contactsBody');
         if (!contacts || contacts.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="2" class="empty-state"><i class="fas fa-inbox"></i>No contacts registered yet</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="4" class="empty-state"><i class="fas fa-inbox"></i>No contacts registered yet</td></tr>`;
           return;
         }
         tbody.innerHTML = contacts.map(c =>
-          `<tr><td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.phone)}</td></tr>`
+          `<tr>
+            <td>${escapeHtml(c.name)}</td>
+            <td>${escapeHtml(c.phone)}</td>
+            <td style="font-size:0.75rem;color:#6b8aaa;">${new Date(c.submittedAt).toLocaleDateString()}</td>
+            <td><button class="btn btn-danger btn-sm" onclick="deleteContact('${c._id}')"><i class="fas fa-times"></i></button></td>
+          </tr>`
         ).join('');
       }
 
@@ -506,16 +662,68 @@
         });
       }
 
+      // ========== CONTACT ACTIONS ==========
+      async function deleteContact(id) {
+        if (!confirm('Delete this contact?')) return;
+        try {
+          const res = await apiCall(`/api/admin/contact/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            showToast('Contact deleted', 'success');
+            loadDashboard();
+          } else {
+            showToast('Delete failed', 'error');
+          }
+        } catch (_) {
+          showToast('Server error', 'error');
+        }
+      }
+
+      async function clearAllContacts() {
+        if (!confirm('⚠️ Delete ALL contacts? This cannot be undone!')) return;
+        try {
+          const res = await apiCall('/api/admin/contacts', { method: 'DELETE' });
+          if (res.ok) {
+            showToast('All contacts cleared', 'success');
+            loadDashboard();
+          } else {
+            showToast('Clear failed', 'error');
+          }
+        } catch (_) {
+          showToast('Server error', 'error');
+        }
+      }
+
+      // ========== EXPORT ==========
+      async function exportCSV() {
+        try {
+          const res = await apiCall('/api/admin/export/csv');
+          if (!res.ok) { showToast('Export failed', 'error'); return; }
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `contacts_${new Date().toISOString().slice(0,10)}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast('CSV exported', 'success');
+        } catch (_) {
+          showToast('Export failed', 'error');
+        }
+      }
+
+      // ========== DOWNLOAD VCF ==========
       async function downloadVCF() {
         try {
           const res = await apiCall('/api/admin/download');
           if (res.status === 403) {
             const data = await res.json();
-            showToast(data.error || 'Timer locked', true);
+            showToast(data.error || 'Timer locked', 'error');
             return;
           }
           if (!res.ok) {
-            showToast('Unauthorized or server error', true);
+            showToast('Download failed', 'error');
             return;
           }
           const blob = await res.blob();
@@ -527,13 +735,106 @@
           a.click();
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
-          showToast('VCF downloaded successfully');
+          showToast('VCF downloaded', 'success');
         } catch (_) {
-          showToast('Download failed', true);
+          showToast('Download failed', 'error');
         }
       }
 
-      // start
+      // ========== TIMER ==========
+      function openTimerModal() {
+        document.getElementById('timerModal').classList.add('active');
+        document.getElementById('timerDays').value = 2;
+      }
+
+      async function updateTimer() {
+        const days = parseInt(document.getElementById('timerDays').value);
+        if (isNaN(days) || days < 0) {
+          showToast('Enter a valid number of days', 'error');
+          return;
+        }
+        try {
+          const res = await apiCall('/api/admin/timer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ days })
+          });
+          if (res.ok) {
+            showToast(`Timer set to ${days} days`, 'success');
+            closeModal('timerModal');
+            loadDashboard();
+          } else {
+            showToast('Update failed', 'error');
+          }
+        } catch (_) {
+          showToast('Server error', 'error');
+        }
+      }
+
+      // ========== ADMIN KEY ==========
+      function openAdminKeyModal() {
+        document.getElementById('adminKeyModal').classList.add('active');
+        document.getElementById('currentKey').value = '';
+        document.getElementById('newKey').value = '';
+        document.getElementById('confirmKey').value = '';
+      }
+
+      async function updateAdminKey() {
+        const current = document.getElementById('currentKey').value.trim();
+        const newKey = document.getElementById('newKey').value.trim();
+        const confirm = document.getElementById('confirmKey').value.trim();
+
+        if (!current || !newKey || !confirm) {
+          showToast('All fields are required', 'error');
+          return;
+        }
+        if (newKey !== confirm) {
+          showToast('New keys do not match', 'error');
+          return;
+        }
+        if (newKey.length < 6) {
+          showToast('New key must be at least 6 characters', 'error');
+          return;
+        }
+
+        try {
+          const res = await apiCall('/api/admin/key', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentKey: current, newKey: newKey })
+          });
+          const data = await res.json();
+          if (res.ok) {
+            showToast('Admin key updated successfully', 'success');
+            closeModal('adminKeyModal');
+            // Re-login with new key
+            authKey = newKey;
+            localStorage.setItem('adminKey', newKey);
+          } else {
+            showToast(data.error || 'Update failed', 'error');
+          }
+        } catch (_) {
+          showToast('Server error', 'error');
+        }
+      }
+
+      // ========== MODAL HELPERS ==========
+      function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+      }
+
+      // Make functions globally accessible
+      window.openTimerModal = openTimerModal;
+      window.openAdminKeyModal = openAdminKeyModal;
+      window.updateTimer = updateTimer;
+      window.updateAdminKey = updateAdminKey;
+      window.closeModal = closeModal;
+      window.deleteContact = deleteContact;
+      window.clearAllContacts = clearAllContacts;
+      window.exportCSV = exportCSV;
+      window.downloadVCF = downloadVCF;
+
+      // Start
       showLogin();
     })();
   </script>
