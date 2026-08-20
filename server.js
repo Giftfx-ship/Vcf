@@ -107,6 +107,17 @@ app.get('/api/admin/contacts', async (req, res) => {
     res.json(contacts);
 });
 
+app.get('/api/admin/stats', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    const admin = await Setting.findOne({ key: 'adminKey' });
+    if (adminKey !== admin.value) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const count = await Contact.countDocuments();
+    const timer = await Setting.findOne({ key: 'unlockTime' });
+    res.json({ totalContacts: count, unlockTime: timer.value });
+});
+
 app.get('/api/admin/download', async (req, res) => {
     const adminKey = req.headers['x-admin-key'];
     const admin = await Setting.findOne({ key: 'adminKey' });
@@ -132,18 +143,98 @@ app.get('/api/admin/download', async (req, res) => {
     res.send(vcf);
 });
 
-app.get('/api/admin/stats', async (req, res) => {
+// ========== NEW ADMIN ROUTES ==========
+
+// Delete single contact
+app.delete('/api/admin/contact/:id', async (req, res) => {
     const adminKey = req.headers['x-admin-key'];
     const admin = await Setting.findOne({ key: 'adminKey' });
     if (adminKey !== admin.value) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
-    const count = await Contact.countDocuments();
-    const timer = await Setting.findOne({ key: 'unlockTime' });
-    res.json({ totalContacts: count, unlockTime: timer.value });
+    try {
+        await Contact.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: 'Delete failed' });
+    }
 });
 
-// Serve pages
+// Delete all contacts
+app.delete('/api/admin/contacts', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    const admin = await Setting.findOne({ key: 'adminKey' });
+    if (adminKey !== admin.value) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    try {
+        await Contact.deleteMany({});
+        res.json({ success: true, message: 'All contacts cleared' });
+    } catch (error) {
+        res.status(500).json({ error: 'Clear failed' });
+    }
+});
+
+// Export CSV
+app.get('/api/admin/export/csv', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    const admin = await Setting.findOne({ key: 'adminKey' });
+    if (adminKey !== admin.value) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const contacts = await Contact.find().sort({ submittedAt: -1 });
+    let csv = 'Name,Phone,Submitted\n';
+    contacts.forEach(c => {
+        csv += `"${c.name}","${c.phone}","${new Date(c.submittedAt).toISOString()}"\n`;
+    });
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=contacts.csv');
+    res.send(csv);
+});
+
+// Update timer
+app.post('/api/admin/timer', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    const admin = await Setting.findOne({ key: 'adminKey' });
+    if (adminKey !== admin.value) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const { days } = req.body;
+    if (days === undefined || days < 0) {
+        return res.status(400).json({ error: 'Invalid days value' });
+    }
+    const unlockTime = Date.now() + (days * 24 * 60 * 60 * 1000);
+    await Setting.findOneAndUpdate(
+        { key: 'unlockTime' },
+        { value: unlockTime },
+        { upsert: true }
+    );
+    res.json({ success: true, unlockTime });
+});
+
+// Update admin key
+app.put('/api/admin/key', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    const admin = await Setting.findOne({ key: 'adminKey' });
+    if (adminKey !== admin.value) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const { currentKey, newKey } = req.body;
+    if (currentKey !== admin.value) {
+        return res.status(403).json({ error: 'Current key is incorrect' });
+    }
+    if (!newKey || newKey.length < 6) {
+        return res.status(400).json({ error: 'New key must be at least 6 characters' });
+    }
+    await Setting.findOneAndUpdate(
+        { key: 'adminKey' },
+        { value: newKey },
+        { upsert: true }
+    );
+    res.json({ success: true, message: 'Admin key updated' });
+});
+
+// ========== SERVE PAGES ==========
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'user.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 
