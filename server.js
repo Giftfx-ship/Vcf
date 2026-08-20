@@ -398,6 +398,6 @@ app.post('/api/admin/announcement', async (req, res) => {
 
 // ========== SERVE PAGES ==========
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'user.html')));
-app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/hehehe', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 
 app.listen(PORT, () => console.log(`✓ Server running on port ${PORT}`));
