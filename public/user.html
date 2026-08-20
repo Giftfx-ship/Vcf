@@ -1,549 +1,616 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>VCF Registry | Contact Exchange</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>VCF Registry · secure contact exchange</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            background: #f8fafc;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            color: #0f172a;
-        }
+    body {
+      background: #f2f5fa;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      color: #0b1a2f;
+    }
 
-        /* Main container */
-        .container {
-            max-width: 520px;
-            width: 100%;
-            margin: 0 auto;
-        }
+    .container {
+      max-width: 540px;
+      width: 100%;
+      margin: 0 auto;
+    }
 
-        /* Card - mature, clean, subtle */
-        .card {
-            background: #ffffff;
-            border-radius: 1.5rem;
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.02);
-            overflow: hidden;
-            transition: box-shadow 0.2s ease;
-        }
+    /* main card – crisp, elevated, neutral */
+    .card {
+      background: #ffffff;
+      border-radius: 2rem;
+      box-shadow: 0 20px 40px -12px rgba(0, 20, 40, 0.12), 0 2px 4px rgba(0,0,0,0.02);
+      overflow: hidden;
+      transition: box-shadow 0.25s ease;
+    }
 
-        .card:hover {
-            box-shadow: 0 25px 40px -14px rgba(0, 0, 0, 0.12);
-        }
+    .card:hover {
+      box-shadow: 0 28px 48px -16px rgba(0, 20, 40, 0.18);
+    }
 
-        /* Header */
-        .header {
-            padding: 1.75rem 2rem 0.75rem 2rem;
-            border-bottom: 1px solid #eef2f6;
-        }
+    /* header – minimal, with subtle accent */
+    .header {
+      padding: 1.8rem 2rem 0.8rem 2rem;
+      border-bottom: 1px solid #eaedf2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
 
-        .header h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            letter-spacing: -0.3px;
-            color: #0f172a;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
 
-        .header h1::before {
-            content: "📇";
-            font-size: 1.5rem;
-            font-weight: normal;
-        }
+    .header-left h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: #0b1a2f;
+    }
 
-        .subhead {
-            font-size: 0.8rem;
-            color: #5b6e8c;
-            margin-top: 0.35rem;
-            font-weight: 400;
-        }
+    .badge {
+      background: #eef3fc;
+      padding: 0.2rem 0.7rem;
+      border-radius: 2rem;
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: #1a5a9c;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      margin-left: 0.2rem;
+    }
 
-        /* Timer section - compact, elegant */
-        .timer-section {
-            padding: 1.25rem 2rem;
-            background: #fafcff;
-            border-bottom: 1px solid #eef2f6;
-        }
+    .subhead {
+      font-size: 0.75rem;
+      color: #4c6a8b;
+      font-weight: 400;
+      width: 100%;
+      margin-top: 0.3rem;
+    }
 
-        .timer-row {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
+    /* timer – clean, monospace, calm */
+    .timer-section {
+      padding: 1rem 2rem 0.8rem 2rem;
+      background: #f8fafd;
+      border-bottom: 1px solid #eaedf2;
+    }
 
-        .timer-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #52789e;
-        }
+    .timer-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
 
-        .timer-value {
-            font-family: 'Inter', monospace;
-            font-size: 1.15rem;
-            font-weight: 500;
-            background: #f1f5f9;
-            padding: 0.25rem 0.75rem;
-            border-radius: 2rem;
-            color: #1e293b;
-            letter-spacing: 0.3px;
-        }
+    .timer-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #40658a;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
 
-        .timer-note {
-            font-size: 0.7rem;
-            color: #5b6e8c;
-            margin-top: 0.6rem;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
+    .timer-value {
+      font-family: 'Inter', monospace;
+      font-size: 1.1rem;
+      font-weight: 500;
+      background: #eef3f9;
+      padding: 0.2rem 0.9rem;
+      border-radius: 3rem;
+      color: #122b44;
+      letter-spacing: 0.2px;
+    }
 
-        .timer-note i {
-            font-size: 0.65rem;
-            color: #3b82f6;
-        }
+    .timer-note {
+      font-size: 0.7rem;
+      color: #4f6f8e;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #f2f7fe;
+      padding: 0.3rem 0.8rem;
+      border-radius: 3rem;
+      width: fit-content;
+    }
 
-        /* Form styling - refined */
-        .form {
-            padding: 2rem;
-        }
+    .timer-note i {
+      font-size: 0.6rem;
+      color: #2a7de1;
+    }
 
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
+    /* form – airy, modern */
+    .form {
+      padding: 1.8rem 2rem 1.5rem 2rem;
+    }
 
-        label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            color: #4a627a;
-            margin-bottom: 0.5rem;
-        }
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
 
-        input {
-            width: 100%;
-            padding: 0.85rem 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.9rem;
-            font-size: 0.95rem;
-            font-family: 'Inter', monospace;
-            background: #ffffff;
-            transition: all 0.2s ease;
-            color: #0f172a;
-        }
+    label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #3b5c7a;
+      margin-bottom: 0.4rem;
+    }
 
-        input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
+    input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid #dbe0e8;
+      border-radius: 1rem;
+      font-size: 0.95rem;
+      font-family: 'Inter', monospace;
+      background: #ffffff;
+      transition: all 0.2s ease;
+      color: #0b1a2f;
+    }
 
-        input::placeholder {
-            color: #9caec9;
-            font-weight: 400;
-            font-size: 0.85rem;
-        }
+    input:focus {
+      outline: none;
+      border-color: #1f6fd9;
+      box-shadow: 0 0 0 4px rgba(31, 111, 217, 0.08);
+    }
 
-        /* Button - clean and professional */
-        button {
-            width: 100%;
-            background: #0f172a;
-            color: white;
-            border: none;
-            padding: 0.9rem;
-            border-radius: 0.9rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-top: 0.5rem;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 0.2px;
-        }
+    input::placeholder {
+      color: #99b0ca;
+      font-weight: 400;
+      font-size: 0.85rem;
+    }
 
-        button:hover {
-            background: #1e293b;
-            transform: translateY(-1px);
-        }
+    button {
+      width: 100%;
+      background: #0b1a2f;
+      color: white;
+      border: none;
+      padding: 0.9rem;
+      border-radius: 1.2rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 0.4rem;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
 
-        button:active {
-            transform: translateY(0);
-        }
+    button:hover {
+      background: #142b44;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(11, 26, 47, 0.15);
+    }
 
-        /* Footer */
-        .footer {
-            padding: 1.25rem 2rem;
-            background: #fafcff;
-            border-top: 1px solid #eef2f6;
-            text-align: center;
-            font-size: 0.7rem;
-            color: #7c8ea0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-        }
+    button:active {
+      transform: translateY(0);
+    }
 
-        .footer span {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
+    /* footer – professional, with channel link */
+    .footer {
+      padding: 0.9rem 2rem 1.2rem 2rem;
+      background: #f8fafd;
+      border-top: 1px solid #eaedf2;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem 1.2rem;
+      font-size: 0.7rem;
+      color: #4f6f8e;
+    }
 
-        /* Modal - mature */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            visibility: hidden;
-            opacity: 0;
-            transition: all 0.2s ease;
-        }
+    .footer span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
 
-        .modal.active {
-            visibility: visible;
-            opacity: 1;
-        }
+    .footer a {
+      color: #1f6fd9;
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: color 0.2s;
+    }
 
-        .modal-card {
-            background: white;
-            border-radius: 1.5rem;
-            max-width: 380px;
-            width: 90%;
-            padding: 2rem;
-            text-align: center;
-            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25);
-        }
+    .footer a:hover {
+      color: #0b3d77;
+      text-decoration: underline;
+    }
 
-        .modal-icon {
-            font-size: 2.8rem;
-            margin-bottom: 0.75rem;
-        }
+    .footer-divider {
+      opacity: 0.3;
+    }
 
-        .modal-card h3 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #0f172a;
-        }
+    /* modal – refined */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(11, 26, 47, 0.6);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: all 0.25s ease;
+    }
 
-        .modal-card p {
-            font-size: 0.85rem;
-            color: #475569;
-            margin-bottom: 1.5rem;
-            line-height: 1.4;
-        }
+    .modal.active {
+      visibility: visible;
+      opacity: 1;
+    }
 
-        .btn-group {
-            display: flex;
-            gap: 0.75rem;
-            justify-content: center;
-        }
+    .modal-card {
+      background: white;
+      border-radius: 2rem;
+      max-width: 380px;
+      width: 90%;
+      padding: 2.2rem 2rem;
+      text-align: center;
+      box-shadow: 0 30px 60px -16px rgba(0,0,0,0.25);
+    }
 
-        .btn-primary {
-            background: #25D366;
-            color: white;
-            text-decoration: none;
-            padding: 0.7rem 1.2rem;
-            border-radius: 2rem;
-            font-weight: 500;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
+    .modal-icon {
+      font-size: 2.8rem;
+      margin-bottom: 0.6rem;
+    }
 
-        .btn-secondary {
-            background: #eef2f6;
-            color: #1e293b;
-            border: none;
-            padding: 0.7rem 1.2rem;
-            border-radius: 2rem;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
+    .modal-card h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #0b1a2f;
+    }
 
-        /* toast */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%) scale(0.95);
-            background: #0f172a;
-            color: white;
-            padding: 0.7rem 1.4rem;
-            border-radius: 2rem;
-            font-size: 0.8rem;
-            font-weight: 500;
-            opacity: 0;
-            transition: all 0.2s ease;
-            pointer-events: none;
-            z-index: 1100;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            white-space: nowrap;
-        }
+    .modal-card p {
+      font-size: 0.85rem;
+      color: #3d5a78;
+      margin-bottom: 1.8rem;
+      line-height: 1.5;
+    }
 
-        /* subtle utility */
-        .text-mono {
-            font-family: 'Inter', monospace;
-        }
-    </style>
+    .btn-group {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: #25D366;
+      color: white;
+      text-decoration: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 3rem;
+      font-weight: 500;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-primary:hover {
+      background: #1ebe5a;
+      transform: scale(1.02);
+    }
+
+    .btn-secondary {
+      background: #eef3f9;
+      color: #1e3a5a;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 3rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: #dce4ef;
+    }
+
+    /* toast */
+    .toast {
+      position: fixed;
+      bottom: 2.2rem;
+      left: 50%;
+      transform: translateX(-50%) scale(0.96);
+      background: #0b1a2f;
+      color: white;
+      padding: 0.7rem 1.6rem;
+      border-radius: 3rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.25s ease;
+      pointer-events: none;
+      z-index: 1100;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .toast.error {
+      background: #b91c2c;
+    }
+
+    @media (max-width: 480px) {
+      .header { padding: 1.2rem 1.2rem 0.6rem 1.2rem; }
+      .form { padding: 1.2rem; }
+      .timer-section { padding: 0.8rem 1.2rem; }
+      .footer { padding: 0.8rem 1.2rem; flex-direction: column; gap: 0.3rem; }
+      .modal-card { padding: 1.8rem 1.2rem; }
+    }
+  </style>
 </head>
 <body>
-
 <div class="container">
-    <div class="card">
-        <div class="header">
-            <h1>VCF Registry</h1>
-            <div class="subhead">Secure contact exchange · WhatsApp verified</div>
-        </div>
+  <div class="card">
 
-        <div class="timer-section">
-            <div class="timer-row">
-                <span class="timer-label">⌛ VCF RELEASE</span>
-                <span class="timer-value" id="timerDisplay">--:--:--:--</span>
-            </div>
-            <div class="timer-note">
-                <i class="fas fa-info-circle"></i>
-                <span id="timerMessage">The contact list will be available after the countdown and will be posted on group,join group to download vcf when ready.</span>
-            </div>
-        </div>
-
-        <div class="form">
-            <div class="form-group">
-                <label>Full name</label>
-                <input type="text" id="userName" placeholder="e.g., Dev Gift" autocomplete="off">
-            </div>
-            <div class="form-group">
-                <label>WhatsApp number</label>
-                <input type="tel" id="userPhone" placeholder="+1234567890" autocomplete="off">
-            </div>
-            <button id="submitBtn">Submit registration</button>
-        </div>
-
-        <div class="footer">
-            <span>🔒 Encrypted storage</span>
-            <span>•</span>
-            <span>📱 contacts synced</span>
-            <span>•</span>
-            <span>😗 Made by Dev Gift</span>
-        </div>
+    <!-- header -->
+    <div class="header">
+      <div class="header-left">
+        <h1>VCF Registry</h1>
+        <span class="badge">secure</span>
+      </div>
+      <div class="subhead">verified contact exchange · WhatsApp</div>
     </div>
+
+    <!-- timer -->
+    <div class="timer-section">
+      <div class="timer-row">
+        <span class="timer-label"><i class="fas fa-clock" style="font-size:0.7rem;"></i> VCF release</span>
+        <span class="timer-value" id="timerDisplay">--:--:--</span>
+      </div>
+      <div class="timer-note">
+        <i class="fas fa-info-circle"></i>
+        <span id="timerMessage">The contact list will be shared in the group when the timer finishes.</span>
+      </div>
+    </div>
+
+    <!-- form -->
+    <div class="form">
+      <div class="form-group">
+        <label>Full name</label>
+        <input type="text" id="userName" placeholder="e.g. Dev Gift" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>WhatsApp number</label>
+        <input type="tel" id="userPhone" placeholder="+2349164624021" autocomplete="off">
+      </div>
+      <button id="submitBtn"><i class="fas fa-check-circle" style="font-size:0.9rem;"></i> Submit registration</button>
+    </div>
+
+    <!-- footer with channel link -->
+    <div class="footer">
+      <span>🔒 encrypted</span>
+      <span class="footer-divider">•</span>
+      <span>📱 contacts synced</span>
+      <span class="footer-divider">•</span>
+      <a href="https://whatsapp.com/channel/0029VbAjawl9MF8vQQa0ZT32" target="_blank" rel="noopener">
+        <i class="fab fa-whatsapp"></i> channel
+      </a>
+    </div>
+  </div>
 </div>
 
-<!-- WhatsApp Modal -->
+<!-- WhatsApp modal -->
 <div id="waModal" class="modal">
-    <div class="modal-card">
-        <div class="modal-icon">📢</div>
-        <h3>Join the group</h3>
-        <p>The complete VCF file will be shared inside the WhatsApp group once the timer finishes. Join to receive all contacts.</p>
-        <div class="btn-group">
-            <a id="waLink" href="#" target="_blank" class="btn-primary"><i class="fab fa-whatsapp"></i> Join group</a>
-            <button id="closeModalBtn" class="btn-secondary">Close</button>
-        </div>
+  <div class="modal-card">
+    <div class="modal-icon">📢</div>
+    <h3>Join the group</h3>
+    <p>The complete VCF file will be shared inside the WhatsApp group once the timer finishes. Join to receive all contacts.</p>
+    <div class="btn-group">
+      <a id="waLink" href="#" target="_blank" class="btn-primary"><i class="fab fa-whatsapp"></i> Join group</a>
+      <button id="closeModalBtn" class="btn-secondary">Close</button>
     </div>
+  </div>
 </div>
 
 <div id="toastMsg" class="toast">✨ Ready</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 <script>
-    // ======================== CONFIGURATION ========================
-    // Replace with your actual WhatsApp group invite link
+  (function() {
+    // ===== CONFIG =====
     const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/LLawjYepQeu6zbxgtgmpOS";
     const API_BASE = window.location.origin;
-    
+
     let unlockTimestamp = null;
     let timerInterval = null;
 
-    // ---------- HELPER FUNCTIONS ----------
+    // DOM refs
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerMessage = document.getElementById('timerMessage');
+    const userName = document.getElementById('userName');
+    const userPhone = document.getElementById('userPhone');
+    const submitBtn = document.getElementById('submitBtn');
+    const toast = document.getElementById('toastMsg');
+    const modal = document.getElementById('waModal');
+    const waLink = document.getElementById('waLink');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    // ----- toast -----
     function showToast(message, isError = false) {
-        const toast = document.getElementById('toastMsg');
-        toast.textContent = message;
-        toast.style.backgroundColor = isError ? '#dc2626' : '#0f172a';
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateX(-50%) scale(1)';
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(-50%) scale(0.95)';
-        }, 2800);
+      toast.textContent = message;
+      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) scale(1)';
+      clearTimeout(toast._hide);
+      toast._hide = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) scale(0.96)';
+      }, 2800);
     }
 
-    // Format compact timer (d h m s)
+    // ----- timer formatting -----
     function formatCompactTimer(ms) {
-        if (ms <= 0) return "Available now";
-        const days = Math.floor(ms / 86400000);
-        const hours = Math.floor((ms % 86400000) / 3600000);
-        const minutes = Math.floor((ms % 3600000) / 60000);
-        const seconds = Math.floor((ms % 60000) / 1000);
-        
-        if (days > 0) return `${days}d ${hours}h ${minutes}m`;
-        if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
-        if (minutes > 0) return `${minutes}m ${seconds}s`;
-        return `${seconds}s`;
+      if (ms <= 0) return "Available now";
+      const days = Math.floor(ms / 86400000);
+      const hours = Math.floor((ms % 86400000) / 3600000);
+      const minutes = Math.floor((ms % 3600000) / 60000);
+      const seconds = Math.floor((ms % 60000) / 1000);
+
+      if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+      if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+      if (minutes > 0) return `${minutes}m ${seconds}s`;
+      return `${seconds}s`;
     }
 
     function updateTimerUI() {
-        const timerEl = document.getElementById('timerDisplay');
-        const messageEl = document.getElementById('timerMessage');
-        if (!unlockTimestamp) return;
-        
-        const now = Date.now();
-        const diff = unlockTimestamp - now;
-        
-        if (diff <= 0) {
-            if (timerInterval) clearInterval(timerInterval);
-            timerEl.textContent = "Released ✓";
-            messageEl.innerHTML = "The VCF file has been published in the WhatsApp group";
-            return;
-        }
-        
-        timerEl.textContent = formatCompactTimer(diff);
-        const daysLeft = Math.ceil(diff / 86400000);
-        if (daysLeft > 1) {
-            messageEl.innerHTML = `VCF will be available in ${daysLeft} days · vcf will be posted in group when ready,kindly join group to be notified.`;
-        } else if (daysLeft === 1) {
-            messageEl.innerHTML = `Final day — VCF releases tomorrow in the WhatsApp group`;
-        } else {
-            messageEl.innerHTML = `Releasing today · stay tuned on WhatsApp`;
-        }
+      if (!unlockTimestamp) return;
+      const now = Date.now();
+      const diff = unlockTimestamp - now;
+
+      if (diff <= 0) {
+        if (timerInterval) clearInterval(timerInterval);
+        timerDisplay.textContent = "Released ✓";
+        timerMessage.innerHTML = "VCF file is now available in the WhatsApp group.";
+        return;
+      }
+
+      timerDisplay.textContent = formatCompactTimer(diff);
+      const daysLeft = Math.ceil(diff / 86400000);
+      if (daysLeft > 1) {
+        timerMessage.innerHTML = `VCF available in ${daysLeft} days · join the group to get notified.`;
+      } else if (daysLeft === 1) {
+        timerMessage.innerHTML = `Final day — VCF releases tomorrow in the WhatsApp group.`;
+      } else {
+        timerMessage.innerHTML = `Releasing today · stay tuned on WhatsApp.`;
+      }
     }
 
+    // ----- load timer (backend or fallback) -----
     async function loadTimerFromServer() {
-        try {
-            const response = await fetch(`${API_BASE}/api/timer`);
-            if (!response.ok) throw new Error('timer fetch failed');
-            const data = await response.json();
-            unlockTimestamp = data.unlockTime;
-            updateTimerUI();
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(updateTimerUI, 1000);
-        } catch (err) {
-            console.warn("fallback to local timer", err);
-            // graceful fallback: 2 days timer local
-            const localFallback = localStorage.getItem("vcf_timer_fallback");
-            if (localFallback) {
-                unlockTimestamp = parseInt(localFallback);
-            } else {
-                unlockTimestamp = Date.now() + (2 * 24 * 60 * 60 * 1000);
-                localStorage.setItem("vcf_timer_fallback", unlockTimestamp);
-            }
-            updateTimerUI();
-            timerInterval = setInterval(updateTimerUI, 1000);
+      try {
+        const resp = await fetch(`${API_BASE}/api/timer`);
+        if (!resp.ok) throw new Error('timer fetch failed');
+        const data = await resp.json();
+        unlockTimestamp = data.unlockTime;
+        updateTimerUI();
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimerUI, 1000);
+      } catch (_) {
+        // fallback: 2 days from now
+        const stored = localStorage.getItem('vcf_timer_fallback');
+        if (stored) {
+          unlockTimestamp = parseInt(stored, 10);
+        } else {
+          unlockTimestamp = Date.now() + (2 * 24 * 60 * 60 * 1000);
+          localStorage.setItem('vcf_timer_fallback', String(unlockTimestamp));
         }
+        updateTimerUI();
+        timerInterval = setInterval(updateTimerUI, 1000);
+      }
     }
 
-    // Submit contact to backend (MongoDB)
+    // ----- submit contact -----
     async function submitContact(name, phone) {
-        try {
-            const response = await fetch(`${API_BASE}/api/contact`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, phone })
-            });
-            const data = await response.json();
-            if (response.ok) {
-                return { success: true, message: data.message || 'Registration complete' };
-            } else {
-                return { success: false, message: data.error || 'Submission failed' };
-            }
-        } catch (err) {
-            return { success: false, message: 'Network error. Please try again.' };
+      try {
+        const resp = await fetch(`${API_BASE}/api/contact`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone })
+        });
+        const data = await resp.json();
+        if (resp.ok) {
+          return { success: true, message: data.message || 'Registration complete' };
+        } else {
+          return { success: false, message: data.error || 'Submission failed' };
         }
+      } catch (_) {
+        return { success: false, message: 'Network error. Please try again.' };
+      }
     }
 
-    // Show WhatsApp group modal
+    // ----- modal controls -----
     function showWhatsAppModal() {
-        const modal = document.getElementById('waModal');
-        const waLink = document.getElementById('waLink');
-        waLink.href = WHATSAPP_GROUP_URL;
-        modal.classList.add('active');
+      waLink.href = WHATSAPP_GROUP_URL;
+      modal.classList.add('active');
     }
 
     function closeModal() {
-        document.getElementById('waModal').classList.remove('active');
+      modal.classList.remove('active');
     }
 
-    // Event listeners
-    document.getElementById('submitBtn').addEventListener('click', async () => {
-        const name = document.getElementById('userName').value.trim();
-        const phone = document.getElementById('userPhone').value.trim();
-        
-        if (!name) {
-            showToast('Please enter your full name', true);
-            return;
-        }
-        if (!phone) {
-            showToast('WhatsApp number is required', true);
-            return;
-        }
-        // basic international number validation
-        const phoneClean = phone.replace(/[\s\-\(\)]/g, '');
-        if (!phoneClean.match(/^\+?[0-9]{8,15}$/)) {
-            showToast('Enter a valid phone number (e.g., +1234567890)', true);
-            return;
-        }
-        
-        // Disable button to avoid double submission
-        const btn = document.getElementById('submitBtn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = 'Submitting...';
-        btn.disabled = true;
-        
-        const result = await submitContact(name, phoneClean);
-        
-        if (result.success) {
-            showToast('✓ Registration successful');
-            document.getElementById('userName').value = '';
-            document.getElementById('userPhone').value = '';
-            // Show WhatsApp group modal
-            showWhatsAppModal();
-        } else {
-            showToast(result.message || 'Registration failed', true);
-        }
-        
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+    // ----- event listeners -----
+    submitBtn.addEventListener('click', async () => {
+      const name = userName.value.trim();
+      const phone = userPhone.value.trim();
+
+      if (!name) { showToast('Please enter your full name', true); return; }
+      if (!phone) { showToast('WhatsApp number is required', true); return; }
+
+      const phoneClean = phone.replace(/[\s\-\(\)]/g, '');
+      if (!phoneClean.match(/^\+?[0-9]{8,15}$/)) {
+        showToast('Enter a valid phone (e.g. +1234567890)', true);
+        return;
+      }
+
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Submitting...';
+      submitBtn.disabled = true;
+
+      const result = await submitContact(name, phoneClean);
+
+      if (result.success) {
+        showToast('✓ Registration successful');
+        userName.value = '';
+        userPhone.value = '';
+        showWhatsAppModal();
+      } else {
+        showToast(result.message || 'Registration failed', true);
+      }
+
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
     });
-    
-    // Close modal handlers
-    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-    // click outside to close? optional for ux
+
+    closeModalBtn.addEventListener('click', closeModal);
     window.addEventListener('click', (e) => {
-        const modal = document.getElementById('waModal');
-        if (e.target === modal) closeModal();
+      if (e.target === modal) closeModal();
     });
-    
-    // Initialization
+
+    // ----- init -----
     loadTimerFromServer();
+  })();
 </script>
 </body>
 </html>
