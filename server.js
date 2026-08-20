@@ -31,6 +31,7 @@ mongoose.connect(MONGODB_URI)
 const ContactSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true },
     phone: { type: String, required: true, unique: true, trim: true },
+    batch: { type: String, default: 'Batch 1' },
     submittedAt: { type: Date, default: Date.now }
 });
 const Contact = mongoose.model('Contact', ContactSchema);
@@ -57,13 +58,50 @@ async function initSystem() {
         await Setting.create({ key: 'adminKey', value: 'DevGift2026' });
         console.log('✓ Admin credentials set');
     }
+
+    // Set default batch number
+    const batch = await Setting.findOne({ key: 'batchNumber' });
+    if (!batch) {
+        await Setting.create({ key: 'batchNumber', value: '1' });
+        console.log('✓ Batch number initialized');
+    }
+
+    // Set default announcement
+    const announcement = await Setting.findOne({ key: 'announcement' });
+    if (!announcement) {
+        await Setting.create({ key: 'announcement', value: 'Welcome! The VCF will be released soon. Join our WhatsApp group for updates.' });
+        console.log('✓ Announcement initialized');
+    }
 }
 initSystem();
+
+// ========== SELF-PING (KEEP ALIVE) ==========
+const PORT = process.env.PORT || 3000;
+
+function selfPing() {
+    const url = `http://localhost:${PORT}`;
+    fetch(url)
+        .then(() => console.log('✓ Self-ping successful'))
+        .catch(err => console.log('✗ Self-ping failed:', err.message));
+}
+
+// Start self-ping after server starts
+setTimeout(() => {
+    selfPing();
+    setInterval(selfPing, 14 * 60 * 1000); // Every 14 minutes
+}, 5000);
 
 // ========== PUBLIC API ==========
 app.get('/api/timer', async (req, res) => {
     const timer = await Setting.findOne({ key: 'unlockTime' });
-    res.json({ unlockTime: timer.value, isUnlocked: Date.now() >= timer.value });
+    const batch = await Setting.findOne({ key: 'batchNumber' });
+    const announcement = await Setting.findOne({ key: 'announcement' });
+    res.json({ 
+        unlockTime: timer.value, 
+        isUnlocked: Date.now() >= timer.value,
+        batch: batch ? batch.value : '1',
+        announcement: announcement ? announcement.value : ''
+    });
 });
 
 app.post('/api/contact', async (req, res) => {
@@ -78,7 +116,12 @@ app.post('/api/contact', async (req, res) => {
             return res.status(409).json({ error: 'Phone number already registered' });
         }
         
-        const contact = new Contact({ name, phone });
+        const batch = await Setting.findOne({ key: 'batchNumber' });
+        const contact = new Contact({ 
+            name, 
+            phone,
+            batch: batch ? `Batch ${batch.value}` : 'Batch 1'
+        });
         await contact.save();
         res.json({ success: true, message: 'Contact registered successfully' });
     } catch (error) {
@@ -115,7 +158,14 @@ app.get('/api/admin/stats', async (req, res) => {
     }
     const count = await Contact.countDocuments();
     const timer = await Setting.findOne({ key: 'unlockTime' });
-    res.json({ totalContacts: count, unlockTime: timer.value });
+    const batch = await Setting.findOne({ key: 'batchNumber' });
+    const announcement = await Setting.findOne({ key: 'announcement' });
+    res.json({ 
+        totalContacts: count, 
+        unlockTime: timer.value,
+        batch: batch ? batch.value : '1',
+        announcement: announcement ? announcement.value : ''
+    });
 });
 
 app.get('/api/admin/download', async (req, res) => {
@@ -143,7 +193,7 @@ app.get('/api/admin/download', async (req, res) => {
     res.send(vcf);
 });
 
-// ========== NEW ADMIN ROUTES ==========
+// ========== ADMIN ROUTES ==========
 
 // Delete single contact
 app.delete('/api/admin/contact/:id', async (req, res) => {
@@ -175,6 +225,48 @@ app.delete('/api/admin/contacts', async (req, res) => {
     }
 });
 
+// Edit contact
+app.put('/api/admin/contact/:id', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    const admin = await Setting.findOne({ key: 'adminKey' });
+    if (adminKey !== admin.value) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const { name, phone } = req.body;
+    try {
+        const contact = await Contact.findByIdAndUpdate(
+            req.params.id,
+            { name, phone },
+            { new: true }
+        );
+        if (!contact) {
+            return res.status(404).json({ error: 'Contact not found' });
+        }
+        res.json({ success: true, contact });
+    } catch (error) {
+        res.status(500).json({ error: 'Update failed' });
+    }
+});
+
+// Update batch number
+app.put('/api/admin/batch', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    const admin = await Setting.findOne({ key: 'adminKey' });
+    if (adminKey !== admin.value) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const { batch } = req.body;
+    if (!batch || isNaN(batch) || batch < 1) {
+        return res.status(400).json({ error: 'Invalid batch number' });
+    }
+    await Setting.findOneAndUpdate(
+        { key: 'batchNumber' },
+        { value: String(batch) },
+        { upsert: true }
+    );
+    res.json({ success: true, batch });
+});
+
 // Export CSV
 app.get('/api/admin/export/csv', async (req, res) => {
     const adminKey = req.headers['x-admin-key'];
@@ -183,9 +275,9 @@ app.get('/api/admin/export/csv', async (req, res) => {
         return res.status(401).json({ error: 'Unauthorized' });
     }
     const contacts = await Contact.find().sort({ submittedAt: -1 });
-    let csv = 'Name,Phone,Submitted\n';
+    let csv = 'Name,Phone,Batch,Submitted\n';
     contacts.forEach(c => {
-        csv += `"${c.name}","${c.phone}","${new Date(c.submittedAt).toISOString()}"\n`;
+        csv += `"${c.name}","${c.phone}","${c.batch}","${new Date(c.submittedAt).toISOString()}"\n`;
     });
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename=contacts.csv');
@@ -204,6 +296,22 @@ app.post('/api/admin/timer', async (req, res) => {
         return res.status(400).json({ error: 'Invalid days value' });
     }
     const unlockTime = Date.now() + (days * 24 * 60 * 60 * 1000);
+    await Setting.findOneAndUpdate(
+        { key: 'unlockTime' },
+        { value: unlockTime },
+        { upsert: true }
+    );
+    res.json({ success: true, unlockTime });
+});
+
+// Reset timer to 2 days
+app.post('/api/admin/timer/reset', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    const admin = await Setting.findOne({ key: 'adminKey' });
+    if (adminKey !== admin.value) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const unlockTime = Date.now() + (2 * 24 * 60 * 60 * 1000);
     await Setting.findOneAndUpdate(
         { key: 'unlockTime' },
         { value: unlockTime },
@@ -234,9 +342,27 @@ app.put('/api/admin/key', async (req, res) => {
     res.json({ success: true, message: 'Admin key updated' });
 });
 
+// Post announcement (message)
+app.post('/api/admin/announcement', async (req, res) => {
+    const adminKey = req.headers['x-admin-key'];
+    const admin = await Setting.findOne({ key: 'adminKey' });
+    if (adminKey !== admin.value) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const { message } = req.body;
+    if (!message) {
+        return res.status(400).json({ error: 'Message is required' });
+    }
+    await Setting.findOneAndUpdate(
+        { key: 'announcement' },
+        { value: message },
+        { upsert: true }
+    );
+    res.json({ success: true, message: 'Announcement updated' });
+});
+
 // ========== SERVE PAGES ==========
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'user.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✓ Server running on port ${PORT}`));
