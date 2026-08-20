@@ -1,842 +1,872 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VCF Admin · complete console</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #f1f5f9;
-      font-family: 'Inter', -apple-system, system-ui, sans-serif;
-      color: #0b1e2e;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | VCF System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #f1f5f9;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: #0b1e2e;
+        }
 
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 2.5rem;
-      right: 2.5rem;
-      background: #0b1e2e;
-      color: white;
-      padding: 0.75rem 1.8rem;
-      border-radius: 3rem;
-      font-size: 0.85rem;
-      font-weight: 500;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-      opacity: 0;
-      transition: opacity 0.2s ease, transform 0.2s ease;
-      transform: translateY(8px);
-      z-index: 999;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-    .toast.error { background: #b91c2c; }
-    .toast.success { background: #059669; }
+        .toast {
+            position: fixed;
+            bottom: 2.5rem;
+            right: 2.5rem;
+            background: #0b1e2e;
+            color: white;
+            padding: 0.75rem 1.8rem;
+            border-radius: 3rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transform: translateY(8px);
+            z-index: 999;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .toast.error { background: #dc2626; }
+        .toast.success { background: #059669; }
 
-    /* Login */
-    .login-container {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(145deg, #f1f5f9 0%, #e6edf5 100%);
-      padding: 1.5rem;
-    }
-    .login-card {
-      background: #ffffff;
-      padding: 2.8rem 2.5rem;
-      border-radius: 2rem;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 30px 50px -20px rgba(0,20,40,0.25), 0 2px 6px rgba(0,0,0,0.02);
-    }
-    .login-card h1 {
-      font-size: 1.6rem;
-      font-weight: 600;
-      letter-spacing: -0.3px;
-      color: #0b1e2e;
-      margin-bottom: 0.3rem;
-    }
-    .login-card p {
-      color: #4b6a88;
-      font-size: 0.9rem;
-      margin-bottom: 1.8rem;
-    }
-    .login-card label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      color: #3a5a78;
-      display: block;
-      margin-bottom: 0.3rem;
-    }
-    .login-card input {
-      width: 100%;
-      padding: 0.85rem 1rem;
-      border: 1px solid #dce3ec;
-      border-radius: 1rem;
-      font-size: 0.95rem;
-      background: #fafcff;
-      transition: 0.2s;
-      font-family: 'Inter', monospace;
-      margin-bottom: 1.2rem;
-    }
-    .login-card input:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 4px rgba(37,99,235,0.08);
-    }
-    .login-card button {
-      width: 100%;
-      background: #0b1e2e;
-      color: white;
-      border: none;
-      padding: 0.9rem;
-      border-radius: 1.2rem;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      font-family: 'Inter', sans-serif;
-    }
-    .login-card button:hover {
-      background: #1b3144;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 18px rgba(11,30,46,0.15);
-    }
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #f1f5f9 0%, #e6edf5 100%);
+            padding: 1.5rem;
+        }
+        .login-card {
+            background: #ffffff;
+            padding: 2.8rem 2.5rem;
+            border-radius: 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 30px 50px -20px rgba(0,20,40,0.25);
+        }
+        .login-card h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #0b1e2e;
+            margin-bottom: 0.3rem;
+        }
+        .login-card p {
+            color: #4b6a88;
+            font-size: 0.9rem;
+            margin-bottom: 1.8rem;
+        }
+        .login-card label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #3a5a78;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+        .login-card input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1px solid #dce3ec;
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            background: #fafcff;
+            transition: 0.2s;
+            font-family: 'Inter', monospace;
+            margin-bottom: 1.2rem;
+        }
+        .login-card input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37,99,235,0.08);
+        }
+        .login-card button {
+            width: 100%;
+            background: #0b1e2e;
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 1.2rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: 'Inter', sans-serif;
+        }
+        .login-card button:hover {
+            background: #1b3144;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(11,30,46,0.15);
+        }
 
-    /* Navbar */
-    .navbar {
-      background: #ffffff;
-      padding: 0.8rem 2.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e2e9f2;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-    .logo {
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: #0b1e2e;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-    .logo i { color: #2563eb; font-size: 1.2rem; }
-    .nav-actions {
-      display: flex;
-      gap: 0.8rem;
-      align-items: center;
-    }
-    .logout {
-      color: #4b6a88;
-      font-weight: 500;
-      font-size: 0.85rem;
-      cursor: pointer;
-      padding: 0.4rem 1rem;
-      border-radius: 2rem;
-      transition: 0.15s;
-      background: #f1f6fc;
-    }
-    .logout:hover {
-      background: #e2eaf4;
-      color: #0b1e2e;
-    }
+        .navbar {
+            background: #ffffff;
+            padding: 0.8rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e9f2;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #0b1e2e;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .logo i { color: #2563eb; }
+        .nav-actions {
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logout {
+            color: #4b6a88;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            transition: 0.15s;
+            background: #f1f6fc;
+        }
+        .logout:hover {
+            background: #e2eaf4;
+            color: #0b1e2e;
+        }
 
-    /* Container */
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 2rem 2.5rem;
-    }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 2.5rem;
+        }
 
-    /* Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2.5rem;
-    }
-    .stat-card {
-      background: white;
-      border-radius: 1.5rem;
-      padding: 1.5rem 1.8rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.02), 0 1px 3px rgba(0,0,0,0.04);
-      border: 1px solid #eaf0f6;
-    }
-    .stat-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #4b6a88;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .stat-value {
-      font-size: 2.1rem;
-      font-weight: 700;
-      color: #0b1e2e;
-      margin-top: 0.3rem;
-      letter-spacing: -0.3px;
-    }
-    .stat-card.timer-info {
-      background: #fafcff;
-      border-left: 5px solid #2563eb;
-    }
-    .stat-card.timer-info .stat-value {
-      font-size: 1.2rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    .badge-unlocked {
-      background: #d1fae5;
-      color: #065f46;
-      padding: 0.15rem 0.8rem;
-      border-radius: 2rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
-    .badge-locked {
-      background: #fef3c7;
-      color: #92400e;
-      padding: 0.15rem 0.8rem;
-      border-radius: 2rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-    }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem 1.8rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            border: 1px solid #eaf0f6;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #4b6a88;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .stat-value {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #0b1e2e;
+            margin-top: 0.3rem;
+        }
+        .stat-card.timer-info { border-left: 5px solid #2563eb; }
+        .stat-card.timer-info .stat-value {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .badge-unlocked {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 0.15rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-locked {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 0.15rem 0.8rem;
+            border-radius: 2rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
 
-    /* Sections */
-    .section {
-      background: white;
-      border-radius: 1.5rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.02), 0 1px 3px rgba(0,0,0,0.04);
-      border: 1px solid #eaf0f6;
-      overflow: hidden;
-      margin-bottom: 2rem;
-    }
-    .section-header {
-      padding: 1.2rem 2rem;
-      border-bottom: 1px solid #eaf0f6;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-      background: #fafcff;
-    }
-    .section-header h2 {
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      color: #2b4b6a;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .section-header h2 i {
-      color: #2563eb;
-      font-size: 1rem;
-    }
-    .section-actions {
-      display: flex;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-    }
-    .btn {
-      padding: 0.6rem 1.4rem;
-      border-radius: 2.5rem;
-      font-weight: 500;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: 0.15s;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: 'Inter', sans-serif;
-      border: none;
-    }
-    .btn-primary {
-      background: #0b1e2e;
-      color: white;
-    }
-    .btn-primary:hover:not(:disabled) {
-      background: #1b3144;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(11,30,46,0.15);
-    }
-    .btn-primary:disabled {
-      background: #bccbde;
-      cursor: not-allowed;
-      opacity: 0.7;
-    }
-    .btn-success {
-      background: #059669;
-      color: white;
-    }
-    .btn-success:hover {
-      background: #047857;
-      transform: translateY(-1px);
-    }
-    .btn-danger {
-      background: #dc2626;
-      color: white;
-    }
-    .btn-danger:hover {
-      background: #b91c2c;
-      transform: translateY(-1px);
-    }
-    .btn-warning {
-      background: #d97706;
-      color: white;
-    }
-    .btn-warning:hover {
-      background: #b45309;
-      transform: translateY(-1px);
-    }
-    .btn-outline {
-      background: transparent;
-      color: #4b6a88;
-      border: 1px solid #dce3ec;
-    }
-    .btn-outline:hover {
-      background: #f1f6fc;
-    }
-    .btn-sm {
-      padding: 0.3rem 0.8rem;
-      font-size: 0.7rem;
-    }
+        .section {
+            background: white;
+            border-radius: 1.5rem;
+            border: 1px solid #eaf0f6;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .section-header {
+            padding: 1.2rem 2rem;
+            border-bottom: 1px solid #eaf0f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            background: #fafcff;
+        }
+        .section-header h2 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #2b4b6a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .section-header h2 i { color: #2563eb; }
+        .section-actions {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.6rem 1.4rem;
+            border-radius: 2.5rem;
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Inter', sans-serif;
+            border: none;
+        }
+        .btn-primary { background: #0b1e2e; color: white; }
+        .btn-primary:hover:not(:disabled) { background: #1b3144; transform: translateY(-1px); }
+        .btn-primary:disabled { background: #bccbde; cursor: not-allowed; opacity: 0.7; }
+        .btn-success { background: #059669; color: white; }
+        .btn-success:hover { background: #047857; transform: translateY(-1px); }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c2c; transform: translateY(-1px); }
+        .btn-warning { background: #d97706; color: white; }
+        .btn-warning:hover { background: #b45309; transform: translateY(-1px); }
+        .btn-outline { background: transparent; color: #4b6a88; border: 1px solid #dce3ec; }
+        .btn-outline:hover { background: #f1f6fc; }
+        .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.7rem; }
 
-    /* Table */
-    .table-wrap {
-      overflow-x: auto;
-      padding: 0.5rem 0;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 1rem 2rem;
-      text-align: left;
-      border-bottom: 1px solid #eaf0f6;
-    }
-    th {
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      color: #4b6a88;
-      background: #f9fcff;
-    }
-    td {
-      font-size: 0.9rem;
-      color: #0b1e2e;
-    }
-    tr:last-child td { border-bottom: none; }
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: #6b8aaa;
-      font-size: 0.9rem;
-    }
-    .empty-state i {
-      font-size: 2rem;
-      color: #c5d6e8;
-      display: block;
-      margin-bottom: 0.5rem;
-    }
+        .table-wrap {
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 1rem 2rem;
+            text-align: left;
+            border-bottom: 1px solid #eaf0f6;
+        }
+        th {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #4b6a88;
+            background: #f9fcff;
+        }
+        td { font-size: 0.9rem; color: #0b1e2e; }
+        tr:last-child td { border-bottom: none; }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6b8aaa;
+        }
+        .empty-state i {
+            font-size: 2rem;
+            color: #c5d6e8;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
 
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(11, 26, 46, 0.6);
-      backdrop-filter: blur(4px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 1.5rem;
-    }
-    .modal-overlay.active {
-      display: flex;
-    }
-    .modal {
-      background: white;
-      border-radius: 1.5rem;
-      max-width: 480px;
-      width: 100%;
-      padding: 2rem;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.2);
-    }
-    .modal h3 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-    .modal p {
-      color: #4b6a88;
-      font-size: 0.9rem;
-      margin-bottom: 1.5rem;
-    }
-    .modal input, .modal select {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      border: 1px solid #dce3ec;
-      border-radius: 1rem;
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-      font-family: 'Inter', sans-serif;
-    }
-    .modal input:focus, .modal select:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
-    }
-    .modal-actions {
-      display: flex;
-      gap: 0.8rem;
-      justify-content: flex-end;
-    }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(11, 26, 46, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1.5rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: white;
+            border-radius: 1.5rem;
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+        }
+        .modal h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .modal p {
+            color: #4b6a88;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .modal input, .modal textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #dce3ec;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+        .modal textarea { min-height: 80px; resize: vertical; }
+        .modal input:focus, .modal textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+        }
+        .modal-actions {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: flex-end;
+        }
 
-    /* Responsive */
-    @media (max-width: 640px) {
-      .navbar { padding: 0.6rem 1.2rem; flex-wrap: wrap; gap: 0.4rem; }
-      .container { padding: 1.2rem; }
-      .stats-grid { grid-template-columns: 1fr; }
-      .section-header { flex-direction: column; align-items: flex-start; }
-      .section-actions { width: 100%; }
-      .section-actions .btn { flex: 1; justify-content: center; }
-      th, td { padding: 0.8rem 1rem; }
-      .login-card { padding: 2rem 1.5rem; }
-      .toast { right: 1rem; bottom: 1.5rem; width: calc(100% - 2rem); border-radius: 1.5rem; justify-content: center; }
-      .modal { padding: 1.5rem; }
-      .modal-actions { flex-direction: column; }
-      .modal-actions .btn { width: 100%; justify-content: center; }
-    }
-  </style>
+        @media (max-width: 640px) {
+            .navbar { padding: 0.6rem 1.2rem; }
+            .container { padding: 1.2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .section-header { flex-direction: column; align-items: flex-start; }
+            .section-actions { width: 100%; }
+            .section-actions .btn { flex: 1; justify-content: center; }
+            th, td { padding: 0.8rem 1rem; font-size: 0.8rem; }
+            .login-card { padding: 2rem 1.5rem; }
+            .toast { right: 1rem; bottom: 1.5rem; width: calc(100% - 2rem); border-radius: 1.5rem; justify-content: center; }
+            .modal { padding: 1.5rem; }
+            .modal-actions { flex-direction: column; }
+            .modal-actions .btn { width: 100%; justify-content: center; }
+        }
+    </style>
 </head>
 <body id="app">
+    <div id="toast" class="toast"><i class="fas fa-circle-check"></i> <span id="toastMsg">Ready</span></div>
+    <script>
+        (function() {
+            let authKey = null;
+            let contacts = [];
+            let stats = { totalContacts: 0, unlockTime: null, batch: '1', announcement: '' };
 
-  <div id="toast" class="toast"><i class="fas fa-circle-check"></i> <span id="toastMsg">Ready</span></div>
+            const toastEl = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
 
-  <script>
-    (function() {
-      let authKey = null;
-      let contacts = [];
-      let stats = { totalContacts: 0, unlockTime: null };
-
-      const toastEl = document.getElementById('toast');
-      const toastMsg = document.getElementById('toastMsg');
-
-      function showToast(msg, type = '') {
-        toastMsg.textContent = msg;
-        toastEl.className = 'toast show ' + type;
-        clearTimeout(toastEl._hide);
-        toastEl._hide = setTimeout(() => {
-          toastEl.classList.remove('show');
-        }, 3200);
-      }
-
-      async function apiCall(endpoint, options = {}) {
-        const res = await fetch(endpoint, {
-          ...options,
-          headers: { ...options.headers, 'X-Admin-Key': authKey || '' }
-        });
-        return res;
-      }
-
-      // ========== LOGIN ==========
-      function showLogin() {
-        document.getElementById('app').innerHTML = `
-          <div class="login-container">
-            <div class="login-card">
-              <h1>🔐 VCF Admin</h1>
-              <p>Secure access · master key required</p>
-              <label for="adminKey">Master key</label>
-              <input type="password" id="adminKey" placeholder="••••••••" autocomplete="off">
-              <button id="loginBtn"><i class="fas fa-arrow-right-to-bracket"></i> Unlock dashboard</button>
-            </div>
-          </div>
-        `;
-        document.getElementById('loginBtn').onclick = async () => {
-          const key = document.getElementById('adminKey').value.trim();
-          if (!key) { showToast('Enter the master key', 'error'); return; }
-          try {
-            const res = await fetch('/api/admin/verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ key })
-            });
-            const data = await res.json();
-            if (data.success) {
-              authKey = key;
-              loadAdminDashboard();
-            } else {
-              showToast('Invalid credentials', 'error');
+            function showToast(msg, type = '') {
+                toastMsg.textContent = msg;
+                toastEl.className = 'toast show ' + type;
+                clearTimeout(toastEl._hide);
+                toastEl._hide = setTimeout(() => toastEl.classList.remove('show'), 3200);
             }
-          } catch (_) {
-            showToast('Server error', 'error');
-          }
-        };
-        document.getElementById('adminKey').addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') document.getElementById('loginBtn').click();
-        });
-      }
 
-      // ========== DASHBOARD ==========
-      function loadAdminDashboard() {
-        document.getElementById('app').innerHTML = `
-          <div class="navbar">
-            <div class="logo"><i class="fas fa-database"></i> VCF Console</div>
-            <div class="nav-actions">
-              <button class="btn btn-outline btn-sm" onclick="openTimerModal()">
-                <i class="fas fa-clock"></i> Timer
-              </button>
-              <button class="btn btn-outline btn-sm" onclick="openAdminKeyModal()">
-                <i class="fas fa-key"></i> Key
-              </button>
-              <div class="logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</div>
-            </div>
-          </div>
-          <div class="container">
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-label"><i class="fas fa-users"></i> Total contacts</div>
-                <div class="stat-value" id="totalContacts">0</div>
-              </div>
-              <div class="stat-card timer-info">
-                <div class="stat-label"><i class="fas fa-clock"></i> VCF release</div>
-                <div class="stat-value" id="timerValue">—</div>
-              </div>
-            </div>
+            async function apiCall(endpoint, options = {}) {
+                const res = await fetch(endpoint, {
+                    ...options,
+                    headers: { ...options.headers, 'X-Admin-Key': authKey || '' }
+                });
+                return res;
+            }
 
-            <div class="section">
-              <div class="section-header">
-                <h2><i class="fas fa-address-book"></i> Registered contacts</h2>
-                <div class="section-actions">
-                  <button class="btn btn-success btn-sm" onclick="exportCSV()">
-                    <i class="fas fa-file-csv"></i> CSV
-                  </button>
-                  <button class="btn btn-primary btn-sm" id="downloadBtn" onclick="downloadVCF()">
-                    <i class="fas fa-file-export"></i> VCF
-                  </button>
-                  <button class="btn btn-danger btn-sm" onclick="clearAllContacts()">
-                    <i class="fas fa-trash"></i> Clear all
-                  </button>
-                </div>
-              </div>
-              <div class="table-wrap">
-                <table>
-                  <thead><tr><th>Name</th><th>Phone</th><th>Submitted</th><th>Action</th></tr></thead>
-                  <tbody id="contactsBody"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+            // ========== LOGIN ==========
+            function showLogin() {
+                document.getElementById('app').innerHTML = `
+                    <div class="login-container">
+                        <div class="login-card">
+                            <h1>🔐 VCF Admin</h1>
+                            <p>Secure access · master key required</p>
+                            <label for="adminKey">Master key</label>
+                            <input type="password" id="adminKey" placeholder="••••••••" autocomplete="off">
+                            <button id="loginBtn"><i class="fas fa-arrow-right-to-bracket"></i> Unlock dashboard</button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('loginBtn').onclick = async () => {
+                    const key = document.getElementById('adminKey').value.trim();
+                    if (!key) { showToast('Enter the master key', 'error'); return; }
+                    try {
+                        const res = await fetch('/api/admin/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ key })
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                            authKey = key;
+                            loadAdminDashboard();
+                        } else {
+                            showToast('Invalid credentials', 'error');
+                        }
+                    } catch (_) { showToast('Server error', 'error'); }
+                };
+                document.getElementById('adminKey').addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') document.getElementById('loginBtn').click();
+                });
+            }
 
-          <!-- Timer Modal -->
-          <div class="modal-overlay" id="timerModal">
-            <div class="modal">
-              <h3><i class="fas fa-clock"></i> VCF Release Timer</h3>
-              <p>Set the countdown until the VCF file can be downloaded.</p>
-              <label>Days until release</label>
-              <input type="number" id="timerDays" value="2" min="0" max="30">
-              <div class="modal-actions">
-                <button class="btn btn-outline" onclick="closeModal('timerModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="updateTimer()">Update timer</button>
-              </div>
-            </div>
-          </div>
+            // ========== DASHBOARD ==========
+            function loadAdminDashboard() {
+                document.getElementById('app').innerHTML = `
+                    <div class="navbar">
+                        <div class="logo"><i class="fas fa-database"></i> VCF Console</div>
+                        <div class="nav-actions">
+                            <button class="btn btn-outline btn-sm" onclick="openTimerModal()">
+                                <i class="fas fa-clock"></i> Timer
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="openBatchModal()">
+                                <i class="fas fa-layer-group"></i> Batch
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="openAnnouncementModal()">
+                                <i class="fas fa-bullhorn"></i> Message
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="openKeyModal()">
+                                <i class="fas fa-key"></i> Key
+                            </button>
+                            <div class="logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label"><i class="fas fa-users"></i> Total contacts</div>
+                                <div class="stat-value" id="totalContacts">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label"><i class="fas fa-layer-group"></i> Current batch</div>
+                                <div class="stat-value" id="batchDisplay">1</div>
+                            </div>
+                            <div class="stat-card timer-info">
+                                <div class="stat-label"><i class="fas fa-clock"></i> VCF release</div>
+                                <div class="stat-value" id="timerValue">—</div>
+                            </div>
+                        </div>
 
-          <!-- Admin Key Modal -->
-          <div class="modal-overlay" id="adminKeyModal">
-            <div class="modal">
-              <h3><i class="fas fa-key"></i> Change Admin Key</h3>
-              <p>Update the master key used to access this dashboard.</p>
-              <label>Current key</label>
-              <input type="password" id="currentKey" placeholder="Enter current key">
-              <label>New key</label>
-              <input type="password" id="newKey" placeholder="Enter new key">
-              <label>Confirm new key</label>
-              <input type="password" id="confirmKey" placeholder="Confirm new key">
-              <div class="modal-actions">
-                <button class="btn btn-outline" onclick="closeModal('adminKeyModal')">Cancel</button>
-                <button class="btn btn-primary" onclick="updateAdminKey()">Update key</button>
-              </div>
-            </div>
-          </div>
-        `;
+                        <div class="section">
+                            <div class="section-header">
+                                <h2><i class="fas fa-address-book"></i> Registered contacts</h2>
+                                <div class="section-actions">
+                                    <button class="btn btn-success btn-sm" onclick="exportCSV()">
+                                        <i class="fas fa-file-csv"></i> CSV
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" id="downloadBtn" onclick="downloadVCF()">
+                                        <i class="fas fa-file-export"></i> VCF
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="clearAllContacts()">
+                                        <i class="fas fa-trash"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-wrap">
+                                <table>
+                                    <thead><tr><th>Name</th><th>Phone</th><th>Batch</th><th>Submitted</th><th>Action</th></tr></thead>
+                                    <tbody id="contactsBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
-        document.getElementById('logoutBtn').onclick = () => { authKey = null; showLogin(); };
-        loadDashboard();
-        if (window._refreshInterval) clearInterval(window._refreshInterval);
-        window._refreshInterval = setInterval(() => {
-          if (authKey) loadDashboard();
-        }, 30000);
-      }
+                    <!-- Timer Modal -->
+                    <div class="modal-overlay" id="timerModal">
+                        <div class="modal">
+                            <h3><i class="fas fa-clock"></i> VCF Release Timer</h3>
+                            <p>Set the countdown until the VCF file can be downloaded.</p>
+                            <label>Days until release</label>
+                            <input type="number" id="timerDays" value="2" min="0" max="30">
+                            <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+                                <button class="btn btn-warning" onclick="resetTimer()" style="flex:1;justify-content:center;">
+                                    <i class="fas fa-undo"></i> Reset to 2 days
+                                </button>
+                            </div>
+                            <div class="modal-actions">
+                                <button class="btn btn-outline" onclick="closeModal('timerModal')">Cancel</button>
+                                <button class="btn btn-primary" onclick="updateTimer()">Update timer</button>
+                            </div>
+                        </div>
+                    </div>
 
-      // ========== LOAD DATA ==========
-      async function loadDashboard() {
-        try {
-          const [contactsRes, statsRes] = await Promise.all([
-            apiCall('/api/admin/contacts'),
-            apiCall('/api/admin/stats')
-          ]);
-          if (contactsRes.ok) contacts = await contactsRes.json();
-          if (statsRes.ok) stats = await statsRes.json();
-          renderTable();
-          renderStats();
-        } catch (_) {
-          showToast('Error loading data', 'error');
-        }
-      }
+                    <!-- Batch Modal -->
+                    <div class="modal-overlay" id="batchModal">
+                        <div class="modal">
+                            <h3><i class="fas fa-layer-group"></i> Batch Number</h3>
+                            <p>Set the current batch number for new registrations.</p>
+                            <label>Batch number</label>
+                            <input type="number" id="batchInput" value="1" min="1">
+                            <div class="modal-actions">
+                                <button class="btn btn-outline" onclick="closeModal('batchModal')">Cancel</button>
+                                <button class="btn btn-primary" onclick="updateBatch()">Update batch</button>
+                            </div>
+                        </div>
+                    </div>
 
-      // ========== RENDER ==========
-      function renderStats() {
-        document.getElementById('totalContacts').innerText = stats.totalContacts || 0;
-        const timerEl = document.getElementById('timerValue');
-        const unlock = stats.unlockTime;
-        if (unlock) {
-          const remaining = unlock - Date.now();
-          if (remaining <= 0) {
-            timerEl.innerHTML = `<span>✓ Released</span> <span class="badge-unlocked">unlocked</span>`;
-            document.getElementById('downloadBtn').disabled = false;
-          } else {
-            const days = Math.ceil(remaining / 86400000);
-            timerEl.innerHTML = `<span>${days} day${days > 1 ? 's' : ''} left</span> <span class="badge-locked">locked</span>`;
-            document.getElementById('downloadBtn').disabled = true;
-          }
-        } else {
-          timerEl.innerHTML = `<span>—</span>`;
-          document.getElementById('downloadBtn').disabled = true;
-        }
-      }
+                    <!-- Announcement Modal -->
+                    <div class="modal-overlay" id="announcementModal">
+                        <div class="modal">
+                            <h3><i class="fas fa-bullhorn"></i> Announcement</h3>
+                            <p>This message will be shown to all users on the main page.</p>
+                            <label>Message</label>
+                            <textarea id="announcementInput" placeholder="Enter announcement message..."></textarea>
+                            <div class="modal-actions">
+                                <button class="btn btn-outline" onclick="closeModal('announcementModal')">Cancel</button>
+                                <button class="btn btn-primary" onclick="updateAnnouncement()">Post message</button>
+                            </div>
+                        </div>
+                    </div>
 
-      function renderTable() {
-        const tbody = document.getElementById('contactsBody');
-        if (!contacts || contacts.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="empty-state"><i class="fas fa-inbox"></i>No contacts registered yet</td></tr>`;
-          return;
-        }
-        tbody.innerHTML = contacts.map(c =>
-          `<tr>
-            <td>${escapeHtml(c.name)}</td>
-            <td>${escapeHtml(c.phone)}</td>
-            <td style="font-size:0.75rem;color:#6b8aaa;">${new Date(c.submittedAt).toLocaleDateString()}</td>
-            <td><button class="btn btn-danger btn-sm" onclick="deleteContact('${c._id}')"><i class="fas fa-times"></i></button></td>
-          </tr>`
-        ).join('');
-      }
+                    <!-- Admin Key Modal -->
+                    <div class="modal-overlay" id="keyModal">
+                        <div class="modal">
+                            <h3><i class="fas fa-key"></i> Change Admin Key</h3>
+                            <p>Update the master key used to access this dashboard.</p>
+                            <label>Current key</label>
+                            <input type="password" id="currentKey" placeholder="Enter current key">
+                            <label>New key</label>
+                            <input type="password" id="newKey" placeholder="Enter new key (min 6 chars)">
+                            <label>Confirm new key</label>
+                            <input type="password" id="confirmKey" placeholder="Confirm new key">
+                            <div class="modal-actions">
+                                <button class="btn btn-outline" onclick="closeModal('keyModal')">Cancel</button>
+                                <button class="btn btn-primary" onclick="updateAdminKey()">Update key</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
 
-      function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-          if (m === '&') return '&amp;';
-          if (m === '<') return '&lt;';
-          if (m === '>') return '&gt;';
-          return m;
-        });
-      }
+                document.getElementById('logoutBtn').onclick = () => { authKey = null; showLogin(); };
+                loadDashboard();
+                if (window._refreshInterval) clearInterval(window._refreshInterval);
+                window._refreshInterval = setInterval(() => {
+                    if (authKey) loadDashboard();
+                }, 30000);
+            }
 
-      // ========== CONTACT ACTIONS ==========
-      async function deleteContact(id) {
-        if (!confirm('Delete this contact?')) return;
-        try {
-          const res = await apiCall(`/api/admin/contact/${id}`, { method: 'DELETE' });
-          if (res.ok) {
-            showToast('Contact deleted', 'success');
-            loadDashboard();
-          } else {
-            showToast('Delete failed', 'error');
-          }
-        } catch (_) {
-          showToast('Server error', 'error');
-        }
-      }
+            // ========== LOAD DATA ==========
+            async function loadDashboard() {
+                try {
+                    const [contactsRes, statsRes] = await Promise.all([
+                        apiCall('/api/admin/contacts'),
+                        apiCall('/api/admin/stats')
+                    ]);
+                    if (contactsRes.ok) contacts = await contactsRes.json();
+                    if (statsRes.ok) stats = await statsRes.json();
+                    renderTable();
+                    renderStats();
+                } catch (_) { showToast('Error loading data', 'error'); }
+            }
 
-      async function clearAllContacts() {
-        if (!confirm('⚠️ Delete ALL contacts? This cannot be undone!')) return;
-        try {
-          const res = await apiCall('/api/admin/contacts', { method: 'DELETE' });
-          if (res.ok) {
-            showToast('All contacts cleared', 'success');
-            loadDashboard();
-          } else {
-            showToast('Clear failed', 'error');
-          }
-        } catch (_) {
-          showToast('Server error', 'error');
-        }
-      }
+            function renderStats() {
+                document.getElementById('totalContacts').innerText = stats.totalContacts || 0;
+                document.getElementById('batchDisplay').innerText = stats.batch || '1';
+                
+                const timerEl = document.getElementById('timerValue');
+                const unlock = stats.unlockTime;
+                if (unlock) {
+                    const remaining = unlock - Date.now();
+                    if (remaining <= 0) {
+                        timerEl.innerHTML = `<span>✓ Released</span> <span class="badge-unlocked">unlocked</span>`;
+                        document.getElementById('downloadBtn').disabled = false;
+                    } else {
+                        const days = Math.ceil(remaining / 86400000);
+                        timerEl.innerHTML = `<span>${days} day${days > 1 ? 's' : ''} left</span> <span class="badge-locked">locked</span>`;
+                        document.getElementById('downloadBtn').disabled = true;
+                    }
+                }
+            }
 
-      // ========== EXPORT ==========
-      async function exportCSV() {
-        try {
-          const res = await apiCall('/api/admin/export/csv');
-          if (!res.ok) { showToast('Export failed', 'error'); return; }
-          const blob = await res.blob();
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `contacts_${new Date().toISOString().slice(0,10)}.csv`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          showToast('CSV exported', 'success');
-        } catch (_) {
-          showToast('Export failed', 'error');
-        }
-      }
+            function renderTable() {
+                const tbody = document.getElementById('contactsBody');
+                if (!contacts || contacts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i>No contacts registered yet</td></tr>`;
+                    return;
+                }
+                tbody.innerHTML = contacts.map(c => `
+                    <tr>
+                        <td>${escapeHtml(c.name)}</td>
+                        <td>${escapeHtml(c.phone)}</td>
+                        <td><span class="badge badge-locked" style="background:#eef2f6;padding:0.15rem 0.6rem;border-radius:1rem;font-size:0.7rem;">${escapeHtml(c.batch || 'Batch 1')}</span></td>
+                        <td style="font-size:0.75rem;color:#6b8aaa;">${new Date(c.submittedAt).toLocaleDateString()}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="editContact('${c._id}')" style="margin-right:0.3rem;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteContact('${c._id}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
 
-      // ========== DOWNLOAD VCF ==========
-      async function downloadVCF() {
-        try {
-          const res = await apiCall('/api/admin/download');
-          if (res.status === 403) {
-            const data = await res.json();
-            showToast(data.error || 'Timer locked', 'error');
-            return;
-          }
-          if (!res.ok) {
-            showToast('Download failed', 'error');
-            return;
-          }
-          const blob = await res.blob();
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `contacts_${new Date().toISOString().slice(0,10)}.vcf`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          showToast('VCF downloaded', 'success');
-        } catch (_) {
-          showToast('Download failed', 'error');
-        }
-      }
+            function escapeHtml(str) {
+                if (!str) return '';
+                return String(str).replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+            }
 
-      // ========== TIMER ==========
-      function openTimerModal() {
-        document.getElementById('timerModal').classList.add('active');
-        document.getElementById('timerDays').value = 2;
-      }
+            // ========== CONTACT ACTIONS ==========
+            async function deleteContact(id) {
+                if (!confirm('Delete this contact?')) return;
+                try {
+                    const res = await apiCall(`/api/admin/contact/${id}`, { method: 'DELETE' });
+                    if (res.ok) { showToast('Contact deleted', 'success'); loadDashboard(); }
+                    else showToast('Delete failed', 'error');
+                } catch (_) { showToast('Server error', 'error'); }
+            }
 
-      async function updateTimer() {
-        const days = parseInt(document.getElementById('timerDays').value);
-        if (isNaN(days) || days < 0) {
-          showToast('Enter a valid number of days', 'error');
-          return;
-        }
-        try {
-          const res = await apiCall('/api/admin/timer', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ days })
-          });
-          if (res.ok) {
-            showToast(`Timer set to ${days} days`, 'success');
-            closeModal('timerModal');
-            loadDashboard();
-          } else {
-            showToast('Update failed', 'error');
-          }
-        } catch (_) {
-          showToast('Server error', 'error');
-        }
-      }
+            async function editContact(id) {
+                const contact = contacts.find(c => c._id === id);
+                if (!contact) return;
+                const newName = prompt('Edit name:', contact.name);
+                if (newName === null) return;
+                const newPhone = prompt('Edit phone:', contact.phone);
+                if (newPhone === null) return;
+                if (!newName.trim() || !newPhone.trim()) {
+                    showToast('Name and phone are required', 'error');
+                    return;
+                }
+                try {
+                    const res = await apiCall(`/api/admin/contact/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: newName.trim(), phone: newPhone.trim() })
+                    });
+                    if (res.ok) { showToast('Contact updated', 'success'); loadDashboard(); }
+                    else showToast('Update failed', 'error');
+                } catch (_) { showToast('Server error', 'error'); }
+            }
 
-      // ========== ADMIN KEY ==========
-      function openAdminKeyModal() {
-        document.getElementById('adminKeyModal').classList.add('active');
-        document.getElementById('currentKey').value = '';
-        document.getElementById('newKey').value = '';
-        document.getElementById('confirmKey').value = '';
-      }
+            async function clearAllContacts() {
+                if (!confirm('⚠️ Delete ALL contacts? This cannot be undone!')) return;
+                try {
+                    const res = await apiCall('/api/admin/contacts', { method: 'DELETE' });
+                    if (res.ok) { showToast('All contacts cleared', 'success'); loadDashboard(); }
+                    else showToast('Clear failed', 'error');
+                } catch (_) { showToast('Server error', 'error'); }
+            }
 
-      async function updateAdminKey() {
-        const current = document.getElementById('currentKey').value.trim();
-        const newKey = document.getElementById('newKey').value.trim();
-        const confirm = document.getElementById('confirmKey').value.trim();
+            // ========== EXPORT ==========
+            async function exportCSV() {
+                try {
+                    const res = await apiCall('/api/admin/export/csv');
+                    if (!res.ok) { showToast('Export failed', 'error'); return; }
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `contacts_${new Date().toISOString().slice(0,10)}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showToast('CSV exported', 'success');
+                } catch (_) { showToast('Export failed', 'error'); }
+            }
 
-        if (!current || !newKey || !confirm) {
-          showToast('All fields are required', 'error');
-          return;
-        }
-        if (newKey !== confirm) {
-          showToast('New keys do not match', 'error');
-          return;
-        }
-        if (newKey.length < 6) {
-          showToast('New key must be at least 6 characters', 'error');
-          return;
-        }
+            // ========== DOWNLOAD VCF ==========
+            async function downloadVCF() {
+                try {
+                    const res = await apiCall('/api/admin/download');
+                    if (res.status === 403) {
+                        const data = await res.json();
+                        showToast(data.error || 'Timer locked', 'error');
+                        return;
+                    }
+                    if (!res.ok) { showToast('Download failed', 'error'); return; }
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `contacts_${new Date().toISOString().slice(0,10)}.vcf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showToast('VCF downloaded', 'success');
+                } catch (_) { showToast('Download failed', 'error'); }
+            }
 
-        try {
-          const res = await apiCall('/api/admin/key', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ currentKey: current, newKey: newKey })
-          });
-          const data = await res.json();
-          if (res.ok) {
-            showToast('Admin key updated successfully', 'success');
-            closeModal('adminKeyModal');
-            // Re-login with new key
-            authKey = newKey;
-            localStorage.setItem('adminKey', newKey);
-          } else {
-            showToast(data.error || 'Update failed', 'error');
-          }
-        } catch (_) {
-          showToast('Server error', 'error');
-        }
-      }
+            // ========== TIMER ==========
+            function openTimerModal() {
+                document.getElementById('timerModal').classList.add('active');
+                document.getElementById('timerDays').value = 2;
+            }
 
-      // ========== MODAL HELPERS ==========
-      function closeModal(id) {
-        document.getElementById(id).classList.remove('active');
-      }
+            async function updateTimer() {
+                const days = parseInt(document.getElementById('timerDays').value);
+                if (isNaN(days) || days < 0) { showToast('Enter a valid number of days', 'error'); return; }
+                try {
+                    const res = await apiCall('/api/admin/timer', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ days })
+                    });
+                    if (res.ok) {
+                        showToast(`Timer set to ${days} days`, 'success');
+                        closeModal('timerModal');
+                        loadDashboard();
+                    } else showToast('Update failed', 'error');
+                } catch (_) { showToast('Server error', 'error'); }
+            }
 
-      // Make functions globally accessible
-      window.openTimerModal = openTimerModal;
-      window.openAdminKeyModal = openAdminKeyModal;
-      window.updateTimer = updateTimer;
-      window.updateAdminKey = updateAdminKey;
-      window.closeModal = closeModal;
-      window.deleteContact = deleteContact;
-      window.clearAllContacts = clearAllContacts;
-      window.exportCSV = exportCSV;
-      window.downloadVCF = downloadVCF;
+            async function resetTimer() {
+                try {
+                    const res = await apiCall('/api/admin/timer/reset', { method: 'POST' });
+                    if (res.ok) {
+                        showToast('Timer reset to 2 days', 'success');
+                        closeModal('timerModal');
+                        loadDashboard();
+                    } else showToast('Reset failed', 'error');
+                } catch (_) { showToast('Server error', 'error'); }
+            }
 
-      // Start
-      showLogin();
-    })();
-  </script>
+            // ========== BATCH ==========
+            function openBatchModal() {
+                document.getElementById('batchModal').classList.add('active');
+                document.getElementById('batchInput').value = stats.batch || '1';
+            }
+
+            async function updateBatch() {
+                const batch = parseInt(document.getElementById('batchInput').value);
+                if (isNaN(batch) || batch < 1) { showToast('Enter a valid batch number', 'error'); return; }
+                try {
+                    const res = await apiCall('/api/admin/batch', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ batch })
+                    });
+                    if (res.ok) {
+                        showToast(`Batch updated to ${batch}`, 'success');
+                        closeModal('batchModal');
+                        loadDashboard();
+                    } else showToast('Update failed', 'error');
+                } catch (_) { showToast('Server error', 'error'); }
+            }
+
+            // ========== ANNOUNCEMENT ==========
+            function openAnnouncementModal() {
+                document.getElementById('announcementModal').classList.add('active');
+                document.getElementById('announcementInput').value = stats.announcement || '';
+            }
+
+            async function updateAnnouncement() {
+                const message = document.getElementById('announcementInput').value.trim();
+                if (!message) { showToast('Message is required', 'error'); return; }
+                try {
+                    const res = await apiCall('/api/admin/announcement', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message })
+                    });
+                    if (res.ok) {
+                        showToast('Announcement posted!', 'success');
+                        closeModal('announcementModal');
+                        loadDashboard();
+                    } else showToast('Post failed', 'error');
+                } catch (_) { showToast('Server error', 'error'); }
+            }
+
+            // ========== ADMIN KEY ==========
+            function openKeyModal() {
+                document.getElementById('keyModal').classList.add('active');
+                document.getElementById('currentKey').value = '';
+                document.getElementById('newKey').value = '';
+                document.getElementById('confirmKey').value = '';
+            }
+
+            async function updateAdminKey() {
+                const current = document.getElementById('currentKey').value.trim();
+                const newKey = document.getElementById('newKey').value.trim();
+                const confirm = document.getElementById('confirmKey').value.trim();
+
+                if (!current || !newKey || !confirm) {
+                    showToast('All fields are required', 'error');
+                    return;
+                }
+                if (newKey !== confirm) {
+                    showToast('New keys do not match', 'error');
+                    return;
+                }
+                if (newKey.length < 6) {
+                    showToast('New key must be at least 6 characters', 'error');
+                    return;
+                }
+
+                try {
+                    const res = await apiCall('/api/admin/key', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ currentKey: current, newKey: newKey })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        showToast('Admin key updated', 'success');
+                        closeModal('keyModal');
+                        authKey = newKey;
+                    } else {
+                        showToast(data.error || 'Update failed', 'error');
+                    }
+                } catch (_) { showToast('Server error', 'error'); }
+            }
+
+            // ========== MODAL HELPERS ==========
+            function closeModal(id) {
+                document.getElementById(id).classList.remove('active');
+            }
+
+            window.openTimerModal = openTimerModal;
+            window.openBatchModal = openBatchModal;
+            window.openAnnouncementModal = openAnnouncementModal;
+            window.openKeyModal = openKeyModal;
+            window.updateTimer = updateTimer;
+            window.resetTimer = resetTimer;
+            window.updateBatch = updateBatch;
+            window.updateAnnouncement = updateAnnouncement;
+            window.updateAdminKey = updateAdminKey;
+            window.closeModal = closeModal;
+            window.deleteContact = deleteContact;
+            window.editContact = editContact;
+            window.clearAllContacts = clearAllContacts;
+            window.exportCSV = exportCSV;
+            window.downloadVCF = downloadVCF;
+
+            showLogin();
+        })();
+    </script>
 </body>
 </html>
