@@ -21,7 +21,7 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // MongoDB Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://mrdev:dev091339@cluster0.grjlq7v.mongodb.net/vcf_system?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://mrdev:09133971843@cluster0.grjlq7v.mongodb.net/vcf_system?retryWrites=true&w=majority';
 
 mongoose.connect(MONGODB_URI)
     .then(() => console.log('✓ MongoDB connected'))
